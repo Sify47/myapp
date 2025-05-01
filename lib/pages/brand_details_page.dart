@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'offer_details_page.dart'; 
 class BrandDetailsPage extends StatelessWidget {
   final String name;
   final String imageUrl;
@@ -16,7 +16,12 @@ class BrandDetailsPage extends StatelessWidget {
         ];
       case 'adidas':
         return [
-          {'title': 'خصومات صيفية حتى 50%', 'image': 'https://deals.hidubai.com/wp-content/uploads/2020/04/09144212/DEALS-IMAGE-701.jpg'},
+          {'brand': 'Adidas',
+      'title': '8% Cash Back',
+      // 'image': 'https://product-images.ibotta.com/admin/2020-04-23/0deb4a45f56feec3Ibotta_OfferCard_Adidas.png',
+      'category': 'رياضي',
+      'expiry' : '2025/7/1',
+      'offerCode': "SAVE20", 'image': 'https://deals.hidubai.com/wp-content/uploads/2020/04/09144212/DEALS-IMAGE-701.jpg'},
           {'title': 'توصيل مجاني على كل الطلبات لاول طلب ليك', 'image': 'https://mir-s3-cdn-cf.behance.net/project_modules/max_3840/60f759108318811.5fbb80d2bab5b.jpg'},
         ];
       case 'puma':
@@ -83,52 +88,57 @@ class BrandDetailsPage extends StatelessWidget {
             const SizedBox(height: 10),
             ...offers.map((offer) => Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 4,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                      // child: Image.network(
-                      //   offer['image']!,
-                      //   height: 150,
-                      //   width: double.infinity,
-                      //   fit: BoxFit.cover,
-                      // ),
-                      child: offer['image']!.endsWith('.svg')
-  ? SvgPicture.network(
-      offer['image']!,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-    )
-  : offer['image']!.startsWith('http')
-    ? Image.network(
-        offer['image']!,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-      )
-    : Image.asset(
-        offer['image']!,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-      )
-,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        offer['title']!,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => OfferDetailsPage(
+                        title: offer['title']!,
+                        imageUrl: offer['image']!,
+                        description: offer['title']!,
+                        category: offer['category']!,
+                        expiry: offer['expiry']!,
+                        offerCode: offer['offerCode']!,
                       ),
-                    )
-                  ],
+                    ),
+                  );
+                },
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                        child: offer['image']!.endsWith('.svg')
+                            ? SvgPicture.network(
+                                offer['image']!,
+                                height: 150,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                offer['image']!,
+                                height: 150,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          offer['title']!,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
+            
             )),
           ],
         ),
