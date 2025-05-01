@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AuthModel extends ChangeNotifier {
-  String _email = '';
-  String _password = '';
+class AuthModel with ChangeNotifier {
+  String email = '';
+  String password = '';
 
-  String get email => _email;
-  String get password => _password;
-
-  void setEmail(String email) {
-    _email = email;
+  void login(String email, String password) {
+    this.email = email;
+    this.password = password;
     notifyListeners();
   }
 
-  void setPassword(String password) {
-    _password = password;
+  void clear() {
+    email = '';
+    password = '';
     notifyListeners();
   }
 }

@@ -11,15 +11,25 @@ class BrandDetailsPage extends StatelessWidget {
     switch (brandName.toLowerCase()) {
       case 'nike':
         return [
-          {'title': 'خصم 30% على الجري', 'image': 'https://cdn.grabon.in/gograbon/images/web-images/uploads/1583914766701/zara-offers.jpg'},
-          {'title': 'اشتر 2 واحصل على 1 مجاناً', 'image': 'https://cdn.grabon.in/gograbon/images/web-images/uploads/1583914766701/zara-offers.jpg'},
+          {'title': 'Up To 40% For All Collection', 'image': 'https://zouton.com/images/originals/blog/BANNER8_1594124351.png'},
+          {'title': 'اشتر 2 واحصل على 1 مجاناً', 'image': 'https://cop.deals/wp-content/uploads/2018/06/Nike20SUMMER.jpg'},
         ];
       case 'adidas':
         return [
-          {'title': 'خصومات صيفية حتى 40%', 'image': 'https://via.placeholder.com/300x150?text=Adidas+1'},
-          {'title': 'توصيل مجاني على كل الطلبات', 'image': 'https://via.placeholder.com/300x150?text=Adidas+2'},
+          {'title': 'خصومات صيفية حتى 50%', 'image': 'https://deals.hidubai.com/wp-content/uploads/2020/04/09144212/DEALS-IMAGE-701.jpg'},
+          {'title': 'توصيل مجاني على كل الطلبات لاول طلب ليك', 'image': 'https://mir-s3-cdn-cf.behance.net/project_modules/max_3840/60f759108318811.5fbb80d2bab5b.jpg'},
         ];
       case 'puma':
+        return [
+          {'title': 'عرض نهاية الأسبوع - 50%', 'image': 'https://cdn.grabon.in/gograbon/images/web-images/uploads/1604657029705/puma-promo-code.jpg'},
+          {'title': 'اشتر حذاء واحصل على جورب مجاني', 'image': 'https://myshoes.vn/image/cache/catalog/2022/banner/cata/giay-puma-chinh-hang-2280x1000.png'},
+        ];
+      case 'zara':
+        return [
+          {'title': 'Up To 70%', 'image': 'https://cdn.grabon.in/gograbon/images/web-images/uploads/1583914766701/zara-offers.jpg'},
+          {'title': 'Up To 4o%', 'image': 'https://images.hotukdeals.com/threads/thread_large/default/3601744_1.jpg'},
+        ];
+      case 'samsung':
         return [
           {'title': 'عرض نهاية الأسبوع - 25%', 'image': 'https://via.placeholder.com/300x150?text=Puma+1'},
           {'title': 'اشتر حذاء واحصل على جورب مجاني', 'image': 'https://via.placeholder.com/300x150?text=Puma+2'},

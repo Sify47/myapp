@@ -16,25 +16,46 @@ class _OffersPageState extends State<OffersPage> {
       'brand': 'Nike',
       'title': 'خصم 30% على الجري',
       'image': 'nike.png',
-      'category': 'رياضي'
+      'category': 'رياضي',
+      'expiry' : '2025/7/1',
+      'offerCode': "SAVE20",
+      // 'description' : ''
     },
     {
       'brand': 'Adidas',
-      'title': 'اشتر 2 واحصل على 1 مجاناً',
-      'image': 'https://via.placeholder.com/300x150?text=Adidas+عرض',
-      'category': 'رياضي'
+      'title': '8% Cash Back',
+      'image': 'https://product-images.ibotta.com/admin/2020-04-23/0deb4a45f56feec3Ibotta_OfferCard_Adidas.png',
+      'category': 'رياضي',
+      'expiry' : '2025/7/1',
+      'offerCode': "SAVE20",
+      // 'description' : ''
     },
     {
       'brand': 'Gucci',
-      'title': 'خصم حتى 50% على الأحذية',
-      'image': 'https://via.placeholder.com/300x150?text=Gucci+عرض',
-      'category': 'فاخر'
+      'title': 'خصم على العطور حتى 20%',
+      'image': 'https://www.dubaidutyfree.com/file/general/GUCCI_TOP_BANNER_1.jpg',
+      'category': 'فاخر',
+      'expiry' : '2025/7/1',
+      'offerCode': "SAVE20",
+      // 'description' : ''
     },
     {
       'brand': 'Zara',
       'title': 'تشكيلة كلاسيكية جديدة',
       'image': 'https://cdn.grabon.in/gograbon/images/web-images/uploads/1583914766701/zara-offers.jpg',
-      'category': 'كلاسيكي'
+      'category': 'كلاسيكي',
+      'expiry' : '2025/7/1',
+      'offerCode': "SAVE20",
+      // 'description' : ''
+    },
+    {
+      'brand': 'Puma',
+      'title': 'خصومات حتى 40%',
+      'image': 'https://www.sears.com.mx/c/puma/img/Banner_principal/PUMA-SEARS-SEPTIEMBRE-D-1.jpg',
+      'category': 'كلاسيكي',
+      'expiry' : '2025/7/5',
+      'offerCode': "SAVE20",
+      // 'description' : ''
     },
   ];
 
@@ -78,7 +99,7 @@ class _OffersPageState extends State<OffersPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => OfferDetailsPage(title : offer['title']! , imageUrl : offer['image']! ,  description : offer['brand']! , expiry : offer['category']! , category : offer['category']!),
+                          builder: (context) => OfferDetailsPage(title : offer['title']! , imageUrl : offer['image']! ,  description : offer['title']! , expiry : offer['expiry']! , category : offer['category']! , offerCode: offer['offerCode']!,),
                         ),
                       );
                     },

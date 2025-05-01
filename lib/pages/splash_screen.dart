@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/Brand.png', width: 100, height: 100),
+            Image.network('https://d26czciiy2b0rz.cloudfront.net/uploads/images/header/waffarha_logo.png', width: 100, height: 100),
             const SizedBox(height: 20),
             const CircularProgressIndicator(color: Colors.white),
             const SizedBox(height: 20),

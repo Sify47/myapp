@@ -23,8 +23,8 @@ class _LoginPageState extends State<LoginPage> {
 
     if (email.isNotEmpty && password.isNotEmpty) {
       // Save email and password to AuthModel
-      Provider.of<AuthModel>(context, listen: false).setEmail(email);
-      Provider.of<AuthModel>(context, listen: false).setPassword(password);
+      Provider.of<AuthModel>(context, listen: false).login(email, password);
+      // Provider.of<AuthModel>(context, listen: false).login(password);
 
       Navigator.pushReplacement(
         context,
