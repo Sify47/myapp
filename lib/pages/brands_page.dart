@@ -80,8 +80,8 @@ class _BrandsPageState extends State<BrandsPage> {
                   : brand['image']!.startsWith('http')
                       ? Image.network(
                           brand['image']!,
-                          height: 90,
-                          width: 90,
+                          height: 100,
+                          width: 100,
                           fit: BoxFit.contain,
                         )
                       : Image.asset(
@@ -118,7 +118,7 @@ class _BrandsPageState extends State<BrandsPage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'ابحث عن ماركة...',
+                hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.white,

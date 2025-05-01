@@ -15,7 +15,7 @@ class _OffersPageState extends State<OffersPage> {
     {
       'brand': 'Nike',
       'title': 'خصم 30% على الجري',
-      'image': 'nike.png',
+      'image': 'https://media.gq.com/photos/61673a9178f964335d8b9bf7/master/pass/101321-nike-deals-lead.jpg',
       'category': 'رياضي',
       'expiry' : '2025/7/1',
       'offerCode': "SAVE20",
@@ -69,7 +69,7 @@ class _OffersPageState extends State<OffersPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(title: const Text('كل العروض')), 
+        appBar: AppBar(title: const Row(mainAxisAlignment: MainAxisAlignment.center , children: [Text('All Offers')],)), 
         body: Column(
           children: [
             SizedBox(

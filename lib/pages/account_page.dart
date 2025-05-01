@@ -14,7 +14,7 @@ class AccountPage extends StatelessWidget {
     final String password = auth.password;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('حسابي')),
+      appBar: AppBar(title: const Row(mainAxisAlignment: MainAxisAlignment.center , children: [Text('Account')],)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
