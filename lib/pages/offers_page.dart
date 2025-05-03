@@ -67,7 +67,7 @@ class _OffersPageState extends State<OffersPage> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: TextDirection.ltr,
       child: Scaffold(
         appBar: AppBar(title: const Row(mainAxisAlignment: MainAxisAlignment.center , children: [Text('All Offers')],)), 
         body: Column(
@@ -89,57 +89,97 @@ class _OffersPageState extends State<OffersPage> {
                 )).toList(),
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredOffers.length,
-                itemBuilder: (context, index) {
-                  final offer = filteredOffers[index];
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OfferDetailsPage(title : offer['title']! , imageUrl : offer['image']! ,  description : offer['title']! , expiry : offer['expiry']! , category : offer['category']! , offerCode: offer['offerCode']!,),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                            child: Image.network(
-                              offer['image']!,
-                              height: 160,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(offer['brand']!, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                                const SizedBox(height: 4),
-                                Text(offer['title']!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                        ],
+                  const SizedBox(height: 10),
+
+      // عروض داخل شبكة Grid
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: GridView.builder(
+            itemCount: filteredOffers.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.75,
+            ),
+            itemBuilder: (context, index) {
+              final offer = filteredOffers[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => OfferDetailsPage(
+                        title: offer['title']!,
+                        imageUrl: offer['image']!,
+                        description: offer['title']!,
+                        expiry: offer['expiry']!,
+                        category: offer['category']!,
+                        offerCode: offer['offerCode']!,
                       ),
                     ),
                   );
                 },
-              ),
-            ),
-          ],
+                child: Container(
+                  height: 70,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // صورة العرض
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        child: Image.network(
+                          offer['image']!,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(offer['brand']!,
+                                style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                            const SizedBox(height: 4),
+                            Text(offer['title']!,
+                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.calendar_today, size: 14, color: Colors.orange),
+                                const SizedBox(width: 4),
+                                Text("ينتهي ${offer['expiry']!}",
+                                    style: const TextStyle(fontSize: 12, color: Colors.orange)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
-    );
-  }
-}
+    ],
+  ),
+));
+  }}

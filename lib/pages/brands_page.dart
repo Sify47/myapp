@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'brand_details_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'brand_details_page.dart';
 
 class BrandsPage extends StatefulWidget {
   const BrandsPage({super.key});
@@ -9,7 +9,7 @@ class BrandsPage extends StatefulWidget {
   State<BrandsPage> createState() => _BrandsPageState();
 }
 
-class _BrandsPageState extends State<BrandsPage> {
+class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
 
   final List<Map<String, String>> _allBrands = [
@@ -47,103 +47,135 @@ class _BrandsPageState extends State<BrandsPage> {
     super.dispose();
   }
 
-  Widget _buildBrandTile(Map<String, String> brand) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => BrandDetailsPage(
-            name: brand['name']!,
-            imageUrl: brand['image']!,
-          ),
-        ));
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeIn,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.grey[200],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Hero(
-              tag: brand['name']!,
-              child: brand['image']!.endsWith('.svg')
-                  ? SvgPicture.network(
-                      brand['image']!,
-                      height: 90,
-                      width: 90,
-                      placeholderBuilder: (context) =>
-                          const CircularProgressIndicator(),
-                    )
-                  : brand['image']!.startsWith('http')
-                      ? Image.network(
-                          brand['image']!,
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.contain,
-                        )
-                      : Image.asset(
-                          brand['image']!,
-                          height: 90,
-                          width: 90,
-                          fit: BoxFit.contain,
-                        ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              brand['name']!,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+  Widget _buildBrandTile(Map<String, String> brand, int index) {
+    return TweenAnimationBuilder(
+      duration: Duration(milliseconds: 300 + index * 100),
+      tween: Tween<double>(begin: 0.8, end: 1.0),
+      curve: Curves.easeOut,
+      builder: (context, double value, child) {
+        return Transform.scale(
+          scale: value,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => BrandDetailsPage(
+                  name: brand['name']!,
+                  imageUrl: brand['image']!,
+                ),
+              ));
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeIn,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black,
+                    blurRadius: 2,
+                    offset: const Offset(2, 4),
+                  )
+                ],
+              ),
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: brand['name']!,
+                    child: brand['image']!.endsWith('.svg')
+                        ? SvgPicture.network(
+                            brand['image']!,
+                            height: 80,
+                            width: 80,
+                            placeholderBuilder: (_) => const CircularProgressIndicator(),
+                          )
+                        : brand['image']!.startsWith('http')
+                            ? Image.network(
+                                brand['image']!,
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.contain,
+                              )
+                            : Image.asset(
+                                brand['image']!,
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.contain,
+                              ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    brand['name']!,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         title: const Text('Brands'),
         centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search...',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.all(12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: Colors.grey),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black,
+                    blurRadius: 4,
+                  )
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
+                  hintText: 'ابحث عن البراند...',
+                  border: InputBorder.none,
+                  prefixIcon: Icon(Icons.search),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 ),
               ),
             ),
           ),
         ),
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Theme.of(context).scaffoldBackgroundColor],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
         ),
-        itemCount: _filteredBrands.length,
-        itemBuilder: (context, index) {
-          final brand = _filteredBrands[index];
-          return _buildBrandTile(brand);
-        },
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: _filteredBrands.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+          ),
+          itemBuilder: (context, index) {
+            return _buildBrandTile(_filteredBrands[index], index);
+          },
+        ),
       ),
     );
   }
