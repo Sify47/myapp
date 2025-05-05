@@ -152,7 +152,7 @@ class HomePage extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => const BrandsPage()),
                       );
                     },
-                    child: const Text('عرض الكل'),
+                    child: const Text('عرض الكل' , style: TextStyle(color: Colors.orange)),
                   ),
                 ],
               ),
@@ -170,31 +170,51 @@ class HomePage extends StatelessWidget {
                     context,
                     'Nike',
                     'https://1000logos.net/wp-content/uploads/2017/03/Nike-Logo.png',
+                    'https://x.com/nike',
+                    'https://instagram.com/nike',
+                    'https://facebook.com/nike',
+                    'https://www.nike.com',
+                    
                   ),
                   brandCard(
                     context,
                     'Adidas',
-                    'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg',
+                    'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg','https://x.com/nike',
+                    'https://instagram.com/nike',
+                    'https://facebook.com/nike',
+                    'https://www.nike.com',
                   ),
                   brandCard(
                     context,
                     'Puma',
-                    'https://1000logos.net/wp-content/uploads/2017/05/PUMA-logo.jpg',
+                    'https://1000logos.net/wp-content/uploads/2017/05/PUMA-logo.jpg','https://x.com/nike',
+                    'https://instagram.com/nike',
+                    'https://facebook.com/nike',
+                    'https://www.nike.com',
                   ),
                   brandCard(
                     context,
                     'New Balance',
-                    'https://logos-world.net/wp-content/uploads/2020/09/New-Balance-Logo.png',
+                    'https://logos-world.net/wp-content/uploads/2020/09/New-Balance-Logo.png','https://x.com/nike',
+                    'https://instagram.com/nike',
+                    'https://facebook.com/nike',
+                    'https://www.nike.com',
                   ),
                   brandCard(
                     context,
                     'Zara',
-                    'https://1000logos.net/wp-content/uploads/2020/02/Zara-Logo-2008.png',
+                    'https://logos-world.net/wp-content/uploads/2020/05/Zara-Logo-1975-2008.png','https://x.com/nike',
+                    'https://instagram.com/nike',
+                    'https://facebook.com/nike',
+                    'https://www.nike.com',
                   ),
                   brandCard(
                     context,
                     'H&M',
-                    'https://logos-world.net/wp-content/uploads/2020/04/HM-Logo.png',
+                    'https://logos-world.net/wp-content/uploads/2020/04/HM-Logo.png','https://x.com/nike',
+                    'https://instagram.com/nike',
+                    'https://facebook.com/nike',
+                    'https://www.nike.com',
                   ),
                 ],
               ),
@@ -294,14 +314,14 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget brandCard(BuildContext context, String name, String imageUrl) {
+  Widget brandCard(BuildContext context, String name, String imageUrl , String x , String inst , String face , String website) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => BrandDetailsPage(name: name , imageUrl: imageUrl,)),
-        );
-      },
+       Navigator.push(
+         context,
+          MaterialPageRoute(builder: (_) => BrandDetailsPage(name: name , imageUrl: imageUrl, facebook: face , x: x, website: website, insta: inst,)),
+       );
+     },
       child: Container(
         width: 90,
         margin: const EdgeInsets.only(right: 16),
@@ -321,10 +341,10 @@ class HomePage extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(6),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(40),
+                borderRadius: BorderRadius.circular(20),
                 child:
                     imageUrl.endsWith('.svg')
-                        ? SvgPicture.network(imageUrl, width: 60, height: 60)
+                        ? SvgPicture.network(imageUrl, width: 50, height: 50)
                         : Image.network(
                           imageUrl,
                           width: 60,

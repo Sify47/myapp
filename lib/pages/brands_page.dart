@@ -13,10 +13,22 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
   final TextEditingController _searchController = TextEditingController();
 
   final List<Map<String, String>> _allBrands = [
-    {'name': 'Zara', 'image': 'https://logos-world.net/wp-content/uploads/2020/05/Zara-Logo-1975-2008.png'},
-    {'name': 'H&M', 'image': 'https://logos-world.net/wp-content/uploads/2020/04/HM-Logo.png'},
-    {'name': 'New Balance', 'image': 'https://logos-world.net/wp-content/uploads/2020/09/New-Balance-Logo.png'},
-    {'name': 'Nike', 'image': 'assets/nike.png'},
+    {'name': 'Zara', 'image': 'https://logos-world.net/wp-content/uploads/2020/05/Zara-Logo-1975-2008.png' , 'facebook': 'https://facebook.com/nike',
+    'instagram': 'https://instagram.com/nike',
+    'twitter': 'https://twitter.com/nike',
+    'website': 'https://www.nike.com'},
+    {'name': 'H&M', 'image': 'https://logos-world.net/wp-content/uploads/2020/04/HM-Logo.png' , 'facebook': 'https://facebook.com/nike',
+    'instagram': 'https://instagram.com/nike',
+    'twitter': 'https://twitter.com/nike',
+    'website': 'https://www.nike.com'},
+    {'name': 'New Balance', 'image': 'https://logos-world.net/wp-content/uploads/2020/09/New-Balance-Logo.png' , 'facebook': 'https://facebook.com/nike',
+    'instagram': 'https://instagram.com/nike',
+    'twitter': 'https://twitter.com/nike',
+    'website': 'https://www.nike.com'},
+    {'name': 'Nike', 'image': 'assets/nike.png' , 'facebook': 'https://facebook.com/nike',
+    'instagram': 'https://instagram.com/nike',
+    'twitter': 'https://twitter.com/nike',
+    'website': 'https://www.nike.com'},
     {'name': 'Samsung', 'image': 'https://pngimg.com/uploads/samsung_logo/samsung_logo_PNG9.png'},
     {'name': 'Adidas', 'image': 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg'},
     {'name': 'Puma', 'image': 'https://logodownload.org/wp-content/uploads/2014/07/puma-logo-0.png'},
@@ -61,6 +73,10 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
                 builder: (_) => BrandDetailsPage(
                   name: brand['name']!,
                   imageUrl: brand['image']!,
+                  facebook: brand['facebook']!,
+                  x : brand['facebook']!,
+                  insta: brand['instagram']!,
+                  website: brand['website']!,
                 ),
               ));
             },

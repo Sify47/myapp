@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'offer_details_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class BrandDetailsPage extends StatelessWidget {
   final String name;
   final String imageUrl;
+  final String facebook;
+  final String x;
+  final String website;
+  final String insta;
 
-  const BrandDetailsPage({super.key, required this.name, required this.imageUrl});
+  const BrandDetailsPage({super.key, required this.name, required this.imageUrl , required this.facebook , required this.insta , required this.website , required this.x});
 
   List<Map<String, String>> getOffers(String brandName) {
     switch (brandName.toLowerCase()) {
@@ -86,6 +92,32 @@ class BrandDetailsPage extends StatelessWidget {
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
           ),
+          Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    
+      IconButton(
+        icon: Icon(Icons.facebook, color: Colors.blue),
+        onPressed: () => launchUrl(Uri.parse(facebook)),
+      ),
+    
+      IconButton(
+        icon: Icon(Icons.camera_alt, color: Colors.purple),
+        onPressed: () => launchUrl(Uri.parse(insta)),
+      ),
+    
+      IconButton(
+        icon: Icon(Icons.alternate_email, color: Colors.lightBlue),
+        onPressed: () => launchUrl(Uri.parse(x)),
+      ),
+    
+      IconButton(
+        icon: Icon(Icons.language),
+        onPressed: () => launchUrl(Uri.parse(website)),
+      ),
+  ],
+),
+
           const SizedBox(height: 24),
           const Text(
             'العروض المتاحة:',
