@@ -11,8 +11,9 @@ class BrandDetailsPage extends StatelessWidget {
   final String x;
   final String website;
   final String insta;
+  final String dec;
 
-  const BrandDetailsPage({super.key, required this.name, required this.imageUrl , required this.facebook , required this.insta , required this.website , required this.x});
+  const BrandDetailsPage({super.key, required this.name, required this.imageUrl , required this.facebook , required this.insta , required this.website , required this.x , required this.dec});
 
   List<Map<String, String>> getOffers(String brandName) {
     switch (brandName.toLowerCase()) {
@@ -66,137 +67,152 @@ class BrandDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final offers = getOffers(name);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(name),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+      return DefaultTabController(
+  length: 2,
+  child: Scaffold(
+    appBar: AppBar(
+      title: Text(name),
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+      elevation: 1,
+      bottom: const TabBar(
+        tabs: [
+          Tab(text: 'العروض'),
+          Tab(text: 'عن البراند'),
+        ],
+        labelColor: Colors.black,
+        indicatorColor: Colors.deepPurple,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Center(
-            child: Hero(
-              tag: name,
-              child: imageUrl.endsWith('.svg')
-                  ? SvgPicture.network(imageUrl, height: 120)
-                  : Image.network(imageUrl, height: 120, fit: BoxFit.contain),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Text(
-              name,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    
-      IconButton(
-        icon: Icon(Icons.facebook, color: Colors.blue),
-        onPressed: () => launchUrl(Uri.parse(facebook)),
-      ),
-    
-      IconButton(
-        icon: Icon(Icons.camera_alt, color: Colors.purple),
-        onPressed: () => launchUrl(Uri.parse(insta)),
-      ),
-    
-      IconButton(
-        icon: Icon(Icons.alternate_email, color: Colors.lightBlue),
-        onPressed: () => launchUrl(Uri.parse(x)),
-      ),
-    
-      IconButton(
-        icon: Icon(Icons.language),
-        onPressed: () => launchUrl(Uri.parse(website)),
-      ),
-  ],
-),
-
-          const SizedBox(height: 24),
-          const Text(
-            'العروض المتاحة:',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          ...offers.map((offer) => AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeIn,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    )
+    ),
+    body: TabBarView(
+      children: [
+        // تبويب العروض
+        ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: offers.length,
+          itemBuilder: (context, index) {
+            final offer = offers[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  )
+                ],
+              ),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => OfferDetailsPage(
+                        title: offer['title']!,
+                        imageUrl: offer['image']!,
+                        description: offer['title']!,
+                        category: offer['category'] ?? 'عام',
+                        expiry: offer['expiry'] ?? 'غير محدد',
+                        offerCode: offer['offerCode'] ?? '',
+                      ),
+                    ),
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                      child: Image.network(
+                        offer['image']!,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(offer['title']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 6),
+                          Text('الفئة: ${offer['category']}', style: const TextStyle(color: Colors.grey)),
+                          Text('ينتهي في: ${offer['expiry']}', style: const TextStyle(color: Colors.grey)),
+                          if (offer['offerCode'] != null && offer['offerCode']!.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.deepPurple.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text('كود العرض: ${offer['offerCode']!}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => OfferDetailsPage(
-                          title: offer['title']!,
-                          imageUrl: offer['image']!,
-                          description: offer['title']!,
-                          category: offer['category'] ?? 'عام',
-                          expiry: offer['expiry'] ?? 'غير محدد',
-                          offerCode: offer['offerCode'] ?? '',
-                        ),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                        child: Image.network(
-                          offer['image']!,
-                          height: 160,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(offer['title']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 6),
-                            if (offer['category'] != null)
-                              Text('الفئة: ${offer['category']!}', style: const TextStyle(color: Colors.grey)),
-                            if (offer['expiry'] != null)
-                              Text('ينتهي في: ${offer['expiry']!}', style: const TextStyle(color: Colors.grey)),
-                            if (offer['offerCode'] != null && offer['offerCode']!.isNotEmpty)
-                              Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.deepPurple.shade50,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text('كود العرض: ${offer['offerCode']!}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+              ),
+            );
+          },
+        ),
+
+        // تبويب عن البراند
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Center(
+                child: Hero(
+                  tag: name,
+                  child: imageUrl.endsWith('.svg')
+                      ? SvgPicture.network(imageUrl, height: 100)
+                      : Image.network(imageUrl, height: 100),
                 ),
-              )),
-        ],
-      ),
-    );
-  }
+              ),
+              const SizedBox(height: 12),
+              Text(name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              Text(dec,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.black87),
+              ),
+              const SizedBox(height: 20),
+              const Text('تابعنا على:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.facebook, color: Colors.blue),
+                    onPressed: () => launchUrl(Uri.parse(facebook)),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.camera_alt, color: Colors.purple),
+                    onPressed: () => launchUrl(Uri.parse(insta)),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.alternate_email, color: Colors.lightBlue),
+                    onPressed: () => launchUrl(Uri.parse(x)),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.language),
+                    onPressed: () => launchUrl(Uri.parse(website)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
+        }
 }

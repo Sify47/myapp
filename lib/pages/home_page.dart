@@ -174,6 +174,7 @@ class HomePage extends StatelessWidget {
                     'https://instagram.com/nike',
                     'https://facebook.com/nike',
                     'https://www.nike.com',
+                    't'
                     
                   ),
                   brandCard(
@@ -183,6 +184,7 @@ class HomePage extends StatelessWidget {
                     'https://instagram.com/nike',
                     'https://facebook.com/nike',
                     'https://www.nike.com',
+                    't'
                   ),
                   brandCard(
                     context,
@@ -191,6 +193,7 @@ class HomePage extends StatelessWidget {
                     'https://instagram.com/nike',
                     'https://facebook.com/nike',
                     'https://www.nike.com',
+                    't'
                   ),
                   brandCard(
                     context,
@@ -199,6 +202,7 @@ class HomePage extends StatelessWidget {
                     'https://instagram.com/nike',
                     'https://facebook.com/nike',
                     'https://www.nike.com',
+                    't'
                   ),
                   brandCard(
                     context,
@@ -207,6 +211,7 @@ class HomePage extends StatelessWidget {
                     'https://instagram.com/nike',
                     'https://facebook.com/nike',
                     'https://www.nike.com',
+                    't'
                   ),
                   brandCard(
                     context,
@@ -215,6 +220,8 @@ class HomePage extends StatelessWidget {
                     'https://instagram.com/nike',
                     'https://facebook.com/nike',
                     'https://www.nike.com',
+                    
+                    't'
                   ),
                 ],
               ),
@@ -314,12 +321,12 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget brandCard(BuildContext context, String name, String imageUrl , String x , String inst , String face , String website) {
+  Widget brandCard(BuildContext context, String name, String imageUrl , String x , String inst , String face , String website , String dec) {
     return GestureDetector(
       onTap: () {
        Navigator.push(
          context,
-          MaterialPageRoute(builder: (_) => BrandDetailsPage(name: name , imageUrl: imageUrl, facebook: face , x: x, website: website, insta: inst,)),
+          MaterialPageRoute(builder: (_) => BrandDetailsPage(name: name , imageUrl: imageUrl, facebook: face , x: x, website: website, insta: inst, dec: dec,)),
        );
      },
       child: Container(
