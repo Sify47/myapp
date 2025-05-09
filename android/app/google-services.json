@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "338315767506",
+    "project_id": "wafrhaa",
+    "storage_bucket": "wafrhaa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338315767506:android:4098ecea4e90a21d0f870b",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_E4iRDPonRPJsz07dTdBq2GLTQYOG0eo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

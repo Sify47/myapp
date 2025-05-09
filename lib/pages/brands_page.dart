@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'brand_details_page.dart';
@@ -9,57 +10,44 @@ class BrandsPage extends StatefulWidget {
   State<BrandsPage> createState() => _BrandsPageState();
 }
 
-class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateMixin {
+class _BrandsPageState extends State<BrandsPage> {
   final TextEditingController _searchController = TextEditingController();
-
-  final List<Map<String, String>> _allBrands = [
-    {'name': 'Zara', 'image': 'https://logos-world.net/wp-content/uploads/2020/05/Zara-Logo-1975-2008.png' , 'facebook': 'https://facebook.com/nike',
-    'instagram': 'https://instagram.com/nike',
-    'twitter': 'https://twitter.com/nike',
-    'website': 'https://www.nike.com', 'dec': 't'},
-    {'name': 'H&M', 'image': 'https://logos-world.net/wp-content/uploads/2020/04/HM-Logo.png' , 'facebook': 'https://facebook.com/nike',
-    'instagram': 'https://instagram.com/nike',
-    'twitter': 'https://twitter.com/nike',
-    'website': 'https://www.nike.com', 'dec': 't'},
-    {'name': 'New Balance', 'image': 'https://logos-world.net/wp-content/uploads/2020/09/New-Balance-Logo.png' , 'facebook': 'https://facebook.com/nike',
-    'instagram': 'https://instagram.com/nike',
-    'twitter': 'https://twitter.com/nike',
-    'website': 'https://www.nike.com'},
-    {'name': 'Nike', 'image': 'assets/nike.png' , 'facebook': 'https://facebook.com/nike',
-    'instagram': 'https://instagram.com/nike',
-    'twitter': 'https://twitter.com/nike',
-    'website': 'https://www.nike.com'},
-    {'name': 'Samsung', 'image': 'https://pngimg.com/uploads/samsung_logo/samsung_logo_PNG9.png'},
-    {'name': 'Adidas', 'image': 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg'},
-    {'name': 'Puma', 'image': 'https://logodownload.org/wp-content/uploads/2014/07/puma-logo-0.png'},
-  ];
-
-  List<Map<String, String>> _filteredBrands = [];
+  List<Map<String, dynamic>> _allBrands = [];
+  List<Map<String, dynamic>> _filteredBrands = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _filteredBrands = _allBrands;
+    _fetchBrands();
     _searchController.addListener(_filterBrands);
+  }
+
+  Future<void> _fetchBrands() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('brands').get();
+      final brands = snapshot.docs.map((doc) => doc.data()).toList();
+      setState(() {
+        _allBrands = brands;
+        _filteredBrands = brands;
+        _isLoading = false;
+      });
+    } catch (e) {
+      Exception("Error fetching brands: $e");
+    }
   }
 
   void _filterBrands() {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredBrands = _allBrands.where((brand) {
-        final name = brand['name']!.toLowerCase();
+        final name = (brand['name'] ?? '').toString().toLowerCase();
         return name.contains(query);
       }).toList();
     });
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Widget _buildBrandTile(Map<String, String> brand, int index) {
+  Widget _buildBrandTile(Map<String, dynamic> brand, int index) {
     return TweenAnimationBuilder(
       duration: Duration(milliseconds: 300 + index * 100),
       tween: Tween<double>(begin: 0.8, end: 1.0),
@@ -71,13 +59,13 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => BrandDetailsPage(
-                  name: brand['name']!,
-                  imageUrl: brand['image']!,
-                  facebook: brand['facebook']!,
-                  x : brand['facebook']!,
-                  insta: brand['instagram']!,
-                  website: brand['website']!,
-                  dec: brand['dec']!,
+                  name: brand['name'] ?? '',
+                  imageUrl: brand['image'] ?? '',
+                  facebook: brand['facebook'] ?? '',
+                  x: brand['x'] ?? '',
+                  insta: brand['instagram'] ?? '',
+                  website: brand['website'] ?? '',
+                  dec: brand['dec'] ?? '',
                 ),
               ));
             },
@@ -87,11 +75,11 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Theme.of(context).cardColor,
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black,
                     blurRadius: 2,
-                    offset: const Offset(2, 4),
+                    offset: Offset(2, 4),
                   )
                 ],
               ),
@@ -100,31 +88,14 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Hero(
-                    tag: brand['name']!,
-                    child: brand['image']!.endsWith('.svg')
-                        ? SvgPicture.network(
-                            brand['image']!,
-                            height: 80,
-                            width: 80,
-                            placeholderBuilder: (_) => const CircularProgressIndicator(),
-                          )
-                        : brand['image']!.startsWith('http')
-                            ? Image.network(
-                                brand['image']!,
-                                height: 80,
-                                width: 80,
-                                fit: BoxFit.contain,
-                              )
-                            : Image.asset(
-                                brand['image']!,
-                                height: 80,
-                                width: 80,
-                                fit: BoxFit.contain,
-                              ),
+                    tag: brand['name'] ?? '',
+                    child: (brand['image'] ?? '').toString().endsWith('.svg')
+                        ? SvgPicture.network(brand['image'] ?? '', height: 80, width: 80)
+                        : Image.network(brand['image'] ?? '', height: 80, width: 80, fit: BoxFit.contain),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    brand['name']!,
+                    brand['name'] ?? '',
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -137,9 +108,14 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: false,
       appBar: AppBar(
         title: const Text('Brands'),
         centerTitle: true,
@@ -149,51 +125,45 @@ class _BrandsPageState extends State<BrandsPage> with SingleTickerProviderStateM
           preferredSize: const Size.fromHeight(60),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black,
-                    blurRadius: 4,
-                  )
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  hintText: 'ابحث عن البراند...',
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            // child: Container(
+            //   decoration: BoxDecoration(
+            //     color: Theme.of(context).cardColor,
+            //     borderRadius: BorderRadius.circular(30),
+            //     boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+            //   ),
+              child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'ابحث عن عرض أو براند...',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: Colors.grey.shade200,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => _searchController.text = value),
+                  ),
                 ),
-              ),
             ),
-          ),
+          // ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Theme.of(context).scaffoldBackgroundColor],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: GridView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: _filteredBrands.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-          ),
-          itemBuilder: (context, index) {
-            return _buildBrandTile(_filteredBrands[index], index);
-          },
-        ),
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : GridView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _filteredBrands.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+              ),
+              itemBuilder: (context, index) => _buildBrandTile(_filteredBrands[index], index),
+            ),
     );
   }
 }

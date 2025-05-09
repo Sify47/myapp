@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../auth_model.dart'; // import the model
-import 'main_page.dart';
-import '../constants/colors.dart';
+import '../auth_model.dart';
 import '../widgets/custom_button.dart';
+import 'main_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -17,37 +15,45 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isLogin = true;
 
-  void _submit() {
-    String email = _emailController.text.trim();
-    String password = _passwordController.text.trim();
+  void _submit() async {
+  String email = _emailController.text.trim();
+  String password = _passwordController.text.trim();
+  final auth = Provider.of<AuthModel>(context, listen: false);
 
-    if (email.isNotEmpty && password.isNotEmpty) {
-      // Save email and password to AuthModel
-      Provider.of<AuthModel>(context, listen: false).login(email, password);
-      // Provider.of<AuthModel>(context, listen: false).login(password);
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainPage()),
-      );
-    } else {
+  if (email.isNotEmpty && password.isNotEmpty) {
+    try {
+      if (_isLogin) {
+        await auth.login(email, password);
+      } else {
+        await auth.register(email, password);
+      }
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter all fields')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please enter all fields')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      // appBar: AppBar(title: const Text("Wafrha")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_isLogin ? 'Login' : 'Register', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+              Text(
+                _isLogin ? 'Login' : 'Register', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.orange),
+              ),
               const SizedBox(height: 24),
               TextField(
                 controller: _emailController,
@@ -67,17 +73,19 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 24),
               CustomButton(
-                text: _isLogin ? 'Login' : 'Register',
                 onPressed: _submit,
+                text: _isLogin ? 'Login' : 'Register',
               ),
-              const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
                   setState(() {
                     _isLogin = !_isLogin;
                   });
                 },
-                child: Text(_isLogin ? "Don't have an account? Register" : "Already have an account? Login"),
+                child: Text(
+                  _isLogin
+                      ? "Don't have an account? Register" : "Already have an account? Login",
+                ),
               ),
             ],
           ),
