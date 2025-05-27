@@ -4,7 +4,8 @@ import 'brand_details_page.dart';
 import 'brands_page.dart';
 import 'offer_details_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'favorite_button.dart';
+import 'favorites_page.dart';
 import 'offers_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -13,41 +14,44 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Wafrha'), centerTitle: true),
+      appBar: AppBar(
+        title: const Text('Wafrha'),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           // textDirection: TextDirection.,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-//             Padding(
-//   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//   child: Row(
-//     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//     children: [
-//       Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: const [
-//           Text('أهلاً بك في', style: TextStyle(fontSize: 14, color: Colors.grey)),
-//           Text('Wafrha 👋', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-//         ],
-//       ),
-//       CircleAvatar(
-//         backgroundImage: NetworkImage('https://i.pravatar.cc/150'), // صورة المستخدم أو أيقونة ثابتة
-//       ),
-//     ],
-//   ),
-// ),
-
+            //             Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: const [
+            //           Text('أهلاً بك في', style: TextStyle(fontSize: 14, color: Colors.grey)),
+            //           Text('Wafrha 👋', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            //         ],
+            //       ),
+            //       CircleAvatar(
+            //         backgroundImage: NetworkImage('https://i.pravatar.cc/150'), // صورة المستخدم أو أيقونة ثابتة
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height: 16),
 
             // 🔥 Section العروض (Offers)
             // Padding(
-              // padding: const EdgeInsets.symmetric(horizontal: 16),
-              // child: const Text('العروض', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            // padding: const EdgeInsets.symmetric(horizontal: 16),
+            // child: const Text('العروض', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             // ),
             // const SizedBox(height: 10),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('offers').snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('offers').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -66,31 +70,38 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => OfferDetailsPage(
-                                title: offer['title'],
-                                imageUrl: offer['image'],
-                                description: offer['description'],
-                                expiry: offer['expiry'],
-                                category: offer['category'],
-                                offerCode: offer['offerCode'],
-                              ),
+                              builder:
+                                  (_) => OfferDetailsPage(
+                                    title: offer['title'],
+                                    imageUrl: offer['image'],
+                                    description: offer['description'],
+                                    expiry: offer['expiry'],
+                                    category: offer['category'],
+                                    offerCode: offer['offerCode'],
+                                  ),
                             ),
                           );
                         },
-                        child: Hero(
-                          tag: offer['image'],
-                          child: Container(
-                            width: 250,
-                            margin: const EdgeInsets.only(right: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              image: DecorationImage(
-                                image: NetworkImage(offer['image']),
-                                fit: BoxFit.contain,
+                        child: Stack(
+                          children: [
+                            Hero(
+                              tag: offer['image'],
+                              child: Container(
+                                width: 250,
+                                margin: const EdgeInsets.only(right: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  image: DecorationImage(
+                                    image: NetworkImage(offer['image']),
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
                               ),
                             ),
-                            child: Container(
+                            
+                            Container(
                               alignment: Alignment.bottomLeft,
+                              width: 250,
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
@@ -102,10 +113,21 @@ class HomePage extends StatelessWidget {
                               ),
                               child: Text(
                                 offer['title'],
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: FavoriteButton(
+                                offerId: offer.id,
+                                offerData: offer.data() as Map<String, dynamic>,
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -133,14 +155,18 @@ class HomePage extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => const BrandsPage()),
                       );
                     },
-                    child: const Text('Show All' , style: TextStyle(color: Colors.orange)),
+                    child: const Text(
+                      'Show All',
+                      style: TextStyle(color: Colors.orange),
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('brands').snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('brands').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -169,7 +195,7 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            
+
             const SizedBox(height: 30),
 
             Padding(
@@ -188,14 +214,18 @@ class HomePage extends StatelessWidget {
                         MaterialPageRoute(builder: (_) => const OffersPage()),
                       );
                     },
-                    child: const Text('All Offers' , style: TextStyle(color: Colors.orange)),
+                    child: const Text(
+                      'All Offers',
+                      style: TextStyle(color: Colors.orange),
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('offers').snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('offers').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -214,14 +244,15 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => OfferDetailsPage(
-                                title: offer['title'],
-                                imageUrl: offer['image'],
-                                description: offer['description'],
-                                expiry: offer['expiry'],
-                                category: offer['category'],
-                                offerCode: offer['offerCode'],
-                              ),
+                              builder:
+                                  (_) => OfferDetailsPage(
+                                    title: offer['title'],
+                                    imageUrl: offer['image'],
+                                    description: offer['description'],
+                                    expiry: offer['expiry'],
+                                    category: offer['category'],
+                                    offerCode: offer['offerCode'],
+                                  ),
                             ),
                           );
                         },
@@ -250,7 +281,10 @@ class HomePage extends StatelessWidget {
                               ),
                               child: Text(
                                 offer['title'],
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
@@ -261,28 +295,38 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-
+            
           ],
         ),
       ),
     );
   }
 
-  Widget brandCard(BuildContext context, String name, String imageUrl, String x, String inst, String face, String website, String dec) {
+  Widget brandCard(
+    BuildContext context,
+    String name,
+    String imageUrl,
+    String x,
+    String inst,
+    String face,
+    String website,
+    String dec,
+  ) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => BrandDetailsPage(
-              name: name,
-              imageUrl: imageUrl,
-              facebook: face,
-              x: x,
-              website: website,
-              insta: inst,
-              dec: dec,
-            ),
+            builder:
+                (_) => BrandDetailsPage(
+                  name: name,
+                  imageUrl: imageUrl,
+                  facebook: face,
+                  x: x,
+                  website: website,
+                  insta: inst,
+                  dec: dec,
+                ),
           ),
         );
       },
@@ -294,7 +338,11 @@ class HomePage extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 boxShadow: [
-                  BoxShadow(color: Colors.grey.shade300, blurRadius: 6, offset: const Offset(0, 4)),
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    blurRadius: 6,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
                 borderRadius: BorderRadius.circular(50),
                 color: Colors.white,
@@ -302,13 +350,23 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.all(6),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: imageUrl.endsWith('.svg')
-                    ? SvgPicture.network(imageUrl, width: 80, height: 80 ,)
-                    : Image.network(imageUrl, width: 80, height: 80, fit: BoxFit.contain),
+                child:
+                    imageUrl.endsWith('.svg')
+                        ? SvgPicture.network(imageUrl, width: 80, height: 80)
+                        : Image.network(
+                          imageUrl,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.contain,
+                        ),
               ),
             ),
             const SizedBox(height: 6),
-            Text(name, style: const TextStyle(fontSize: 13), textAlign: TextAlign.center),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

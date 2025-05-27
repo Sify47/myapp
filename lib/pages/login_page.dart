@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../auth_model.dart';
 import '../widgets/custom_button.dart';
 import 'main_page.dart';
+import 'admin/admin.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -22,23 +23,31 @@ class _LoginPageState extends State<LoginPage> {
 
   if (email.isNotEmpty && password.isNotEmpty) {
     try {
-      if (_isLogin) {
+      // await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      if (email == 'admin@wafrha.com') {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AdminPage()));
+      } else {
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+        if (_isLogin) {
         await auth.login(email, password);
       } else {
         await auth.register(email, password);
       }
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainPage()));
+      }
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
+        SnackBar(content: Text('فشل تسجيل الدخول: $e')),
       );
     }
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please enter all fields')),
+      const SnackBar(content: Text('من فضلك أدخل البريد وكلمة المرور')),
     );
   }
 }
+
 
 
   @override
@@ -87,6 +96,19 @@ class _LoginPageState extends State<LoginPage> {
                       ? "Don't have an account? Register" : "Already have an account? Login",
                 ),
               ),
+//               TextButton(
+//   onPressed: () {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(builder: (_) => const AdminPage()),
+//     );
+//   },
+//   child: const Text(
+//     'تسجيل دخول المدير',
+//     style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+//   ),
+// ),
+
             ],
           ),
         ),

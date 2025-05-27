@@ -1,76 +1,164 @@
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import '../auth_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../auth_model.dart';
+import 're.dart';
 
-// class EditProfilePage extends StatefulWidget {
-//   const EditProfilePage({super.key});
+class EditProfilePage extends StatefulWidget {
+  const EditProfilePage({super.key});
 
-//   @override
-//   State<EditProfilePage> createState() => _EditProfilePageState();
-// }
+  @override
+  State<EditProfilePage> createState() => _EditProfilePageState();
+}
 
-// class _EditProfilePageState extends State<EditProfilePage> {
-//   late TextEditingController _emailController;
-//   late TextEditingController _passwordController;
+class _EditProfilePageState extends State<EditProfilePage> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     final auth = Provider.of<AuthModel>(context, listen: false);
-//     _emailController = TextEditingController(text: auth.email);
-//     _passwordController = TextEditingController(text: auth.password);
-//   }
+  User? user;
+  bool _isLoading = false;
 
-//   @override
-//   void dispose() {
-//     _emailController.dispose();
-//     _passwordController.dispose();
-//     super.dispose();
-//   }
+  @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+    _emailController.text = user?.email ?? '';
+    _nameController.text = user?.displayName ?? '';
+  }
 
-//   void _saveChanges() {
-//     final newEmail = _emailController.text.trim();
-//     final newPassword = _passwordController.text.trim();
+  Future<void> _updateProfile() async {
+    if (!_formKey.currentState!.validate()) return;
 
-//     if (newEmail.isNotEmpty && newPassword.isNotEmpty) {
-//       Provider.of<AuthModel>(context, listen: false).login(newEmail, newPassword);
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('تم حفظ التغييرات')),
-//       );
-//       Navigator.pop(context);
-//     } else {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('الرجاء ملء كل الحقول')),
-//       );
-//     }
-//   }
+    setState(() {
+      _isLoading = true;
+    });
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('تعديل الحساب')),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: _emailController,
-//               decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
-//             ),
-//             const SizedBox(height: 16),
-//             TextField(
-//               controller: _passwordController,
-//               obscureText: true,
-//               decoration: const InputDecoration(labelText: 'كلمة المرور'),
-//             ),
-//             const SizedBox(height: 24),
-//             ElevatedButton(
-//               onPressed: _saveChanges,
-//               child: const Text('حفظ التغييرات'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+    try {
+      if (_emailController.text.trim() != user?.email) {
+        await user?.updateEmail(_emailController.text.trim());
+      }
+
+      if (_nameController.text.trim() != user?.displayName) {
+        await user?.updateDisplayName(_nameController.text.trim());
+      }
+
+      await user?.reload();
+      user = FirebaseAuth.instance.currentUser;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم تحديث الملف الشخصي بنجاح')),
+      );
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        // طلب إعادة تسجيل الدخول
+        final reAuthResult = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ReAuthPage(user: user!),
+          ),
+        );
+
+        if (reAuthResult == true) {
+          // إعادة محاولة التحديث بعد إعادة تسجيل الدخول
+          await _updateProfile();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('تم إلغاء إعادة تسجيل الدخول')),
+          );
+        }
+      } else {
+        String message = 'حدث خطأ أثناء التحديث';
+        if (e.code == 'email-already-in-use') {
+          message = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+        } else if (e.code == 'invalid-email') {
+          message = 'البريد الإلكتروني غير صالح.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ غير متوقع: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('تعديل الملف الشخصي'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'الاسم',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'يرجى إدخال الاسم';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _emailController,
+                decoration: const InputDecoration(
+                  labelText: 'البريد الإلكتروني',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'يرجى إدخال البريد الإلكتروني';
+                  }
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
+                      .hasMatch(value.trim())) {
+                    return 'البريد الإلكتروني غير صالح';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 30),
+              SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _updateProfile,
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : const Text('حفظ التعديلات'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'offer_details_page.dart'; // عدّل حسب مسار الصفحة
+import 'favorite_button.dart';
 
 class OffersPage extends StatefulWidget {
   const OffersPage({super.key});
@@ -13,7 +14,7 @@ class OffersPage extends StatefulWidget {
 class _OffersPageState extends State<OffersPage> {
   String selectedCategory = 'الكل';
   String searchQuery = '';
-  List<Map<String, dynamic>> allOffers = [];
+  List<DocumentSnapshot> allOffers = [];
   bool isLoading = true;
 
   @override
@@ -25,28 +26,18 @@ class _OffersPageState extends State<OffersPage> {
   Future<void> fetchOffers() async {
     final snapshot = await FirebaseFirestore.instance.collection('offers').get();
 
-    final fetched = snapshot.docs.map((doc) {
-      return {
-        'brand': doc['brand'],
-        'title': doc['title'],
-        'image': doc['image'],
-        'category': doc['category'],
-        'expiry': doc['expiry'],
-        'offerCode': doc['offerCode'],
-      };
-    }).toList();
-
     setState(() {
-      allOffers = fetched;
+      allOffers = snapshot.docs;
       isLoading = false;
     });
   }
 
-  List<Map<String, dynamic>> get filteredOffers {
-    return allOffers.where((offer) {
+  List<DocumentSnapshot> get filteredOffers {
+    return allOffers.where((doc) {
+      final offer = doc.data()! as Map<String, dynamic>;
       final matchesCategory = selectedCategory == 'الكل' || offer['category'] == selectedCategory;
-      final matchesSearch = offer['brand'].toLowerCase().contains(searchQuery.toLowerCase()) ||
-          offer['title'].toLowerCase().contains(searchQuery.toLowerCase());
+      final matchesSearch = offer['brand'].toString().toLowerCase().contains(searchQuery.toLowerCase()) ||
+          offer['title'].toString().toLowerCase().contains(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     }).toList();
   }
@@ -54,7 +45,7 @@ class _OffersPageState extends State<OffersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('All Offerrs'), centerTitle: true),
+      appBar: AppBar(title: const Text('All Offers'), centerTitle: true),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -115,7 +106,9 @@ class _OffersPageState extends State<OffersPage> {
                         childAspectRatio: 0.90,
                       ),
                       itemBuilder: (context, index) {
-                        final offer = filteredOffers[index];
+                        final doc = filteredOffers[index];
+                        final offer = doc.data()! as Map<String, dynamic>;
+
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -150,14 +143,18 @@ class _OffersPageState extends State<OffersPage> {
                                 ClipRRect(
                                   borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
                                   child: (offer['image'] ?? '').toString().endsWith('.svg')
-                        ? SvgPicture.network(offer['image'] ?? '', height: 110, width: double.infinity , fit: BoxFit.contain)
-                        : Image.network(offer['image'] ?? '', height: 110, width: double.infinity, fit: BoxFit.contain), 
-                                  // Image.network(
-                                  //   offer['image'],
-                                  //   height: 110,
-                                  //   width: double.infinity,
-                                  //   fit: BoxFit.cover,
-                                  // ),
+                                      ? SvgPicture.network(
+                                          offer['image'] ?? '',
+                                          height: 110,
+                                          width: double.infinity,
+                                          fit: BoxFit.contain,
+                                        )
+                                      : Image.network(
+                                          offer['image'] ?? '',
+                                          height: 110,
+                                          width: double.infinity,
+                                          fit: BoxFit.contain,
+                                        ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -194,6 +191,10 @@ class _OffersPageState extends State<OffersPage> {
                                           Text(
                                             'ينتهي ${offer['expiry']}',
                                             style: const TextStyle(fontSize: 12, color: Colors.orange),
+                                          ),
+                                          FavoriteButton(
+                                            offerId: doc.id,
+                                            offerData: offer,
                                           ),
                                         ],
                                       ),
