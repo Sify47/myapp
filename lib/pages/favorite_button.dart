@@ -6,7 +6,7 @@ class FavoriteButton extends StatefulWidget {
   final String offerId;
   final Map<String, dynamic> offerData;
 
-  const FavoriteButton({Key? key, required this.offerId, required this.offerData}) : super(key: key);
+  const FavoriteButton({super.key, required this.offerId, required this.offerData});
 
   @override
   State<FavoriteButton> createState() => _FavoriteButtonState();

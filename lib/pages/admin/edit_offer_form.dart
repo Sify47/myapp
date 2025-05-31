@@ -35,7 +35,7 @@ class _EditOfferFormState extends State<EditOfferForm> {
     _expiryController = TextEditingController(text: widget.initialData['expiry']);
     _categoryController = TextEditingController(text: widget.initialData['category']);
     _offerCodeController = TextEditingController(text: widget.initialData['offerCode']);
-    _selectedBrand = widget.initialData['brandName'];
+    _selectedBrand = widget.initialData['brand'];
 
     fetchBrands();
   }
@@ -44,7 +44,7 @@ class _EditOfferFormState extends State<EditOfferForm> {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('brands').get();
       setState(() {
-        _brands = snapshot.docs.map((doc) => doc['name'].toString()).toList();
+        _brands = snapshot.docs.map((doc) => doc['brand'].toString()).toList();
       });
     } catch (e) {
       debugPrint('Error loading brands: $e');
@@ -74,7 +74,7 @@ class _EditOfferFormState extends State<EditOfferForm> {
           'expiry': _expiryController.text.trim(),
           'category': _categoryController.text.trim(),
           'offerCode': _offerCodeController.text.trim(),
-          'name': _selectedBrand,
+          'brand': _selectedBrand,
           // 'timestamp': FieldValue.serverTimestamp(),
         });
 
@@ -130,8 +130,8 @@ class _EditOfferFormState extends State<EditOfferForm> {
                   labelText: 'اختر البراند',
                 ),
                 value: _selectedBrand,
-                items: _brands.map((name) {
-                  return DropdownMenuItem(value: name, child: Text(name));
+                items: _brands.map((brand) {
+                  return DropdownMenuItem(value: brand, child: Text(brand));
                 }).toList(),
                 onChanged: (value) {
                   setState(() {
