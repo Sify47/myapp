@@ -18,6 +18,10 @@ class Product {
   final String productStatus; // e.g., 'active', 'inactive', 'draft'
   final Timestamp createdAt;
   final Timestamp updatedAt;
+  // New fields added based on user request
+  final bool isFreeShipping;
+  final bool isFeatured;
+  final bool isNew;
 
   Product({
     required this.id,
@@ -37,6 +41,10 @@ class Product {
     required this.productStatus,
     required this.createdAt,
     required this.updatedAt,
+    // Initialize new fields, default to false
+    this.isFreeShipping = false,
+    this.isFeatured = false,
+    this.isNew = false,
   });
 
   // Factory constructor to create a Product from a Firestore document
@@ -60,6 +68,10 @@ class Product {
       productStatus: data['productStatus'] ?? 'inactive',
       createdAt: data['createdAt'] ?? Timestamp.now(),
       updatedAt: data['updatedAt'] ?? Timestamp.now(),
+      // Read new fields from Firestore, default to false if not present
+      isFreeShipping: data['isFreeShipping'] ?? false,
+      isFeatured: data['isFeatured'] ?? false,
+      isNew: data['isNew'] ?? false,
     );
   }
 
@@ -82,6 +94,10 @@ class Product {
       'productStatus': productStatus,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      // Add new fields to the map
+      'isFreeShipping': isFreeShipping,
+      'isFeatured': isFeatured,
+      'isNew': isNew,
     };
   }
 }

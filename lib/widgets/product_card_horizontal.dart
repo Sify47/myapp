@@ -145,7 +145,7 @@ class ProductCardHorizontal extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 14),
                   // Add to cart button
                   SizedBox(
                     width: double.infinity,

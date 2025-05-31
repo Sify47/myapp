@@ -29,8 +29,12 @@ class _AddProductPageState extends State<AddProductPage> {
   String? _selectedBrandId;
   String _selectedStockStatus = 'in_stock';
   String _selectedProductStatus = 'active';
-  bool _isFreeShipping = false;
-  String _badge = 'none'; // values: none, new, featured, best_seller
+
+  // New boolean flags state
+  // bool _isFreeShipping = false;
+  bool _isFeatured = false;
+  bool _isNew = true; // Default new products to 'true'
+  // String _badge = 'none'; // Removed as we use boolean flags now
 
 
   @override
@@ -39,17 +43,36 @@ class _AddProductPageState extends State<AddProductPage> {
     _fetchBrands();
   }
 
+   @override
+  void dispose() {
+    // Dispose controllers
+    _nameController.dispose();
+    _descController.dispose();
+    _imagesController.dispose();
+    _priceController.dispose();
+    _discountPriceController.dispose();
+    _categoriesController.dispose();
+    _attributesController.dispose();
+    _variantsController.dispose();
+    _skuController.dispose();
+    _stockController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchBrands() async {
+    // Original fetchBrands logic
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('brands').get();
+       if (!mounted) return;
       setState(() {
         _brands = snapshot.docs.map((doc) => {
           'id': doc.id,
-          'name': doc['name'].toString()
+          'name': doc['name']?.toString() ?? 'Unnamed Brand'
         }).toList();
       });
     } catch (e) {
       debugPrint('Error loading brands: $e');
+       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('خطأ في تحميل البراندات: $e'), backgroundColor: Colors.red),
       );
@@ -85,13 +108,16 @@ class _AddProductPageState extends State<AddProductPage> {
           productStatus: _selectedProductStatus,
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now(),
+          // Add the new flags
+          // isFreeShipping: _isFreeShipping,
+          isFeatured: _isFeatured,
+          isNew: _isNew,
           // shippingInfo: null, // Add later if needed
         );
 
         await FirebaseFirestore.instance.collection('products').add(newProduct.toFirestore());
-        // await FirebaseFirestore.instance.collection('products').add(newProduct.toFirestore());
 
-
+         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Row(children: [Icon(Icons.check_circle, color: Colors.white), SizedBox(width: 8), Text('تمت إضافة المنتج بنجاح!')]),
@@ -104,6 +130,9 @@ class _AddProductPageState extends State<AddProductPage> {
           _selectedBrandId = null;
           _selectedStockStatus = 'in_stock';
           _selectedProductStatus = 'active';
+          // _isFreeShipping = false; // Reset flag
+          _isFeatured = false; // Reset flag
+          _isNew = true; // Reset flag to default
           _imagesController.clear();
           _categoriesController.clear();
           _attributesController.clear();
@@ -111,15 +140,19 @@ class _AddProductPageState extends State<AddProductPage> {
         });
 
       } catch (e) {
+         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('حدث خطأ أثناء إضافة المنتج: $e'), backgroundColor: Colors.red),
         );
       } finally {
-        setState(() => _isLoading = false);
+         if (mounted) {
+           setState(() => _isLoading = false);
+        }
       }
     }
   }
 
+  // Original _buildField
   Widget _buildField(TextEditingController controller, String label, IconData icon, {TextInputType keyboardType = TextInputType.text, bool isRequired = true, int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -155,6 +188,7 @@ class _AddProductPageState extends State<AddProductPage> {
     );
   }
 
+  // Original _buildDropdown
  Widget _buildDropdown(String label, IconData icon, List<DropdownMenuItem<String>> items, String? currentValue, ValueChanged<String?> onChanged, {bool isRequired = true}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -179,9 +213,22 @@ class _AddProductPageState extends State<AddProductPage> {
     );
   }
 
+  // Simple SwitchListTile using original theme context
+  Widget _buildSwitch(String title, bool currentValue, ValueChanged<bool> onChanged) {
+     return SwitchListTile(
+        title: Text(title, style: const TextStyle(color: Colors.teal)), // Using original style color
+        value: currentValue,
+        onChanged: onChanged,
+        activeColor: Colors.orange, // Using original active color
+        tileColor: Colors.grey[100], // Match background
+        contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), // Adjust padding if needed
+      );
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    // Original Scaffold and AppBar
     return Scaffold(
       appBar: AppBar(
         title: const Text('إضافة منتج جديد'),
@@ -206,6 +253,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   children: [
                     const Text('تفاصيل المنتج', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal), textAlign: TextAlign.center),
                     const SizedBox(height: 20),
+                    // Original Fields
                     _buildField(_nameController, 'اسم المنتج', Icons.label),
                     _buildField(_descController, 'الوصف', Icons.description, maxLines: 3),
                     _buildField(_imagesController, 'روابط الصور (مفصولة بفاصلة)', Icons.image, maxLines: 2),
@@ -227,37 +275,15 @@ class _AddProductPageState extends State<AddProductPage> {
                       const DropdownMenuItem(value: 'inactive', child: Text('غير نشط (مخفي)')),
                       const DropdownMenuItem(value: 'draft', child: Text('مسودة')),
                     ], _selectedProductStatus, (value) => setState(() => _selectedProductStatus = value!)),
-                    // شحن مجاني
-SwitchListTile(
-  title: const Text('شحن مجاني', style: TextStyle(color: Colors.teal)),
-  value: _isFreeShipping,
-  onChanged: (value) => setState(() => _isFreeShipping = value),
-  activeColor: Colors.orange,
-),
 
-// الشعار (Badge)
-DropdownButtonFormField<String>(
-  decoration: InputDecoration(
-    prefixIcon: const Icon(Icons.star, color: Colors.orange),
-    labelText: 'الشعار المميز',
-    labelStyle: const TextStyle(color: Colors.orange),
-    filled: true,
-    fillColor: Colors.grey[100],
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-    focusedBorder: OutlineInputBorder(
-      borderSide: const BorderSide(color: Colors.teal, width: 2),
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-  value: _badge,
-  items: const [
-    DropdownMenuItem(value: 'none', child: Text('بدون')),
-    DropdownMenuItem(value: 'new', child: Text('جديد')),
-    DropdownMenuItem(value: 'featured', child: Text('مميز')),
-    DropdownMenuItem(value: 'best_seller', child: Text('الأكثر مبيعًا')),
-  ],
-  onChanged: (value) => setState(() => _badge = value!),
-),
+                    // Add Switches for new flags
+                    const SizedBox(height: 10),
+                    // _buildSwitch('شحن مجاني', _isFreeShipping, (value) => setState(() => _isFreeShipping = value)),
+                    _buildSwitch('منتج مميز', _isFeatured, (value) => setState(() => _isFeatured = value)),
+                    _buildSwitch('منتج جديد', _isNew, (value) => setState(() => _isNew = value)),
+                    const SizedBox(height: 10),
+
+                    // Removed original Badge Dropdown
 
                     // TODO: Add fields for attributes and variants (potentially using more complex widgets)
                     // _buildField(_attributesController, 'السمات (JSON)', Icons.settings_input_component, isRequired: false, maxLines: 2),
@@ -270,7 +296,7 @@ DropdownButtonFormField<String>(
                             icon: const Icon(Icons.add),
                             label: const Text('إضافة المنتج'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
+                              backgroundColor: Colors.orange, // Original color
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               textStyle: const TextStyle(fontSize: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

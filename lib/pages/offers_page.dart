@@ -103,7 +103,7 @@ class _OffersPageState extends State<OffersPage> {
                         crossAxisCount: 2,
                         mainAxisSpacing: 15,
                         crossAxisSpacing: 15,
-                        childAspectRatio: 0.90,
+                        childAspectRatio: 0.84,
                       ),
                       itemBuilder: (context, index) {
                         final doc = filteredOffers[index];

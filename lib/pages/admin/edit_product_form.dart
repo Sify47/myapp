@@ -34,12 +34,34 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
   late String _selectedStockStatus;
   late String _selectedProductStatus;
 
+  // New boolean flags state
+  late bool _isFreeShipping;
+  late bool _isFeatured;
+  late bool _isNew;
+
   @override
   void initState() {
     super.initState();
     _initializeControllers();
     _fetchBrands();
   }
+
+   @override
+  void dispose() {
+    // Dispose controllers
+    _nameController.dispose();
+    _descController.dispose();
+    _imagesController.dispose();
+    _priceController.dispose();
+    _discountPriceController.dispose();
+    _categoriesController.dispose();
+    _attributesController.dispose();
+    _variantsController.dispose();
+    _skuController.dispose();
+    _stockController.dispose();
+    super.dispose();
+  }
+
 
   void _initializeControllers() {
     _nameController = TextEditingController(text: widget.product.name);
@@ -54,26 +76,34 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
     _selectedStockStatus = widget.product.stockStatus;
     _selectedProductStatus = widget.product.productStatus;
 
+    // Initialize new flags from the product object
+    _isFreeShipping = widget.product.isFreeShipping;
+    _isFeatured = widget.product.isFeatured;
+    _isNew = widget.product.isNew;
+
     // Placeholders for complex fields - load actual data if available and format
     _attributesController = TextEditingController(text: widget.product.attributes.toString()); // Basic display
     _variantsController = TextEditingController(text: widget.product.variants.toString()); // Basic display
   }
 
   Future<void> _fetchBrands() async {
+    // Original fetchBrands logic
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('brands').get();
+       if (!mounted) return;
       setState(() {
         _brands = snapshot.docs.map((doc) => {
           'id': doc.id,
-          'name': doc['name'].toString()
+          'name': doc['name']?.toString() ?? 'Unnamed Brand'
         }).toList();
         // Ensure the current brand ID is valid
         if (!_brands.any((brand) => brand['id'] == _selectedBrandId)) {
-          _selectedBrandId = null; // Reset if brand doesn't exist anymore
+          _selectedBrandId = _brands.isNotEmpty ? _brands.first['id'] : null; // Default to first or null
         }
       });
     } catch (e) {
       debugPrint('Error loading brands: $e');
+       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('خطأ في تحميل البراندات: $e'), backgroundColor: Colors.red),
       );
@@ -106,12 +136,17 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
           'brandId': _selectedBrandId!,
           'productStatus': _selectedProductStatus,
           'updatedAt': Timestamp.now(), // Update the timestamp
+          // Add the new flags to the update map
+          'isFreeShipping': _isFreeShipping,
+          'isFeatured': _isFeatured,
+          'isNew': _isNew,
           // Keep createdAt the same
-          'createdAt': widget.product.createdAt,
+          // 'createdAt': widget.product.createdAt, // Don't need to include if not changing
         };
 
         await FirebaseFirestore.instance.collection('products').doc(widget.product.id).update(updatedProductData);
 
+         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Row(children: [Icon(Icons.check_circle, color: Colors.white), SizedBox(width: 8), Text('تم تحديث المنتج بنجاح!')]),
@@ -121,16 +156,19 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
         Navigator.pop(context); // Go back after successful update
 
       } catch (e) {
+         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('حدث خطأ أثناء تحديث المنتج: $e'), backgroundColor: Colors.red),
         );
       } finally {
-        setState(() => _isLoading = false);
+         if (mounted) {
+           setState(() => _isLoading = false);
+        }
       }
     }
   }
 
-  // Re-use _buildField and _buildDropdown from AddProductPage (or move to a shared utility file)
+  // Original _buildField
   Widget _buildField(TextEditingController controller, String label, IconData icon, {TextInputType keyboardType = TextInputType.text, bool isRequired = true, int maxLines = 1}) {
      return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -166,6 +204,7 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
     );
   }
 
+  // Original _buildDropdown
  Widget _buildDropdown(String label, IconData icon, List<DropdownMenuItem<String>> items, String? currentValue, ValueChanged<String?> onChanged, {bool isRequired = true}) {
      return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -190,8 +229,21 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
     );
   }
 
+  // Simple SwitchListTile using original theme context (copied from add_product_page)
+  Widget _buildSwitch(String title, bool currentValue, ValueChanged<bool> onChanged) {
+     return SwitchListTile(
+        title: Text(title, style: const TextStyle(color: Colors.teal)), // Using original style color
+        value: currentValue,
+        onChanged: onChanged,
+        activeColor: Colors.orange, // Using original active color
+        tileColor: Colors.grey[100], // Match background
+        contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0), // Adjust padding if needed
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Original Scaffold and AppBar
     return Scaffold(
       appBar: AppBar(
         title: Text('تعديل: ${widget.product.name}'),
@@ -216,6 +268,7 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
                   children: [
                     const Text('تعديل تفاصيل المنتج', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal), textAlign: TextAlign.center),
                     const SizedBox(height: 20),
+                    // Original Fields
                     _buildField(_nameController, 'اسم المنتج', Icons.label),
                     _buildField(_descController, 'الوصف', Icons.description, maxLines: 3),
                     _buildField(_imagesController, 'روابط الصور (مفصولة بفاصلة)', Icons.image, maxLines: 2),
@@ -237,6 +290,14 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
                       const DropdownMenuItem(value: 'inactive', child: Text('غير نشط (مخفي)')),
                       const DropdownMenuItem(value: 'draft', child: Text('مسودة')),
                     ], _selectedProductStatus, (value) => setState(() => _selectedProductStatus = value!)),
+
+                    // Add Switches for new flags
+                    const SizedBox(height: 10),
+                    _buildSwitch('شحن مجاني', _isFreeShipping, (value) => setState(() => _isFreeShipping = value)),
+                    _buildSwitch('منتج مميز', _isFeatured, (value) => setState(() => _isFeatured = value)),
+                    _buildSwitch('منتج جديد', _isNew, (value) => setState(() => _isNew = value)),
+                    const SizedBox(height: 10),
+
                     // TODO: Add fields for attributes and variants
                     const SizedBox(height: 20),
                     _isLoading
@@ -246,7 +307,7 @@ class _EditProductFormPageState extends State<EditProductFormPage> {
                             icon: const Icon(Icons.save),
                             label: const Text('حفظ التعديلات'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal, // Changed color for update
+                              backgroundColor: Colors.teal, // Original color for update button
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               textStyle: const TextStyle(fontSize: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

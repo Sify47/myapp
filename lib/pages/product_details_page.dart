@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, avoid_types_as_parameter_names
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -31,16 +33,53 @@ class ProductDetailsPage extends StatelessWidget {
     );
   }
 
+  // Helper widget for creating badges (similar to ProductCard)
+  Widget _buildBadge(BuildContext context, String text, Color backgroundColor, IconData? icon) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(right: 6, bottom: 6), // Add margin between badges
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          )
+        ]
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Icon(icon, size: 14, color: theme.colorScheme.onPrimary.withOpacity(0.9)),
+          if (icon != null)
+            const SizedBox(width: 4),
+          Text(
+            text,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onPrimary, // Assuming badge background contrasts well with onPrimary
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartService = Provider.of<CartService>(context, listen: false);
     final reviewService = Provider.of<ReviewService>(context, listen: false);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('تفاصيل المنتج'),
-        centerTitle: true,
-        elevation: 1,
+        // Use theme's AppBarTheme
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -59,11 +98,7 @@ class ProductDetailsPage extends StatelessWidget {
             },
             icon: const Icon(Icons.shopping_cart_outlined),
             label: const Text("أضف إلى السلة"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              textStyle: const TextStyle(fontSize: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
+            // Style from theme
           ),
         ),
       ),
@@ -78,24 +113,56 @@ class ProductDetailsPage extends StatelessWidget {
           }
 
           final product = Product.fromFirestore(snapshot.data!);
+          final bool hasDiscount = product.discountPrice != null;
 
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Hero image
-                Hero(
-                  tag: product.id,
-                  child: Container(
-                    color: Colors.grey.shade100,
-                    height: 300,
-                    child: product.images.isNotEmpty
-                        ? PageView.builder(
-                            itemCount: product.images.length,
-                            itemBuilder: (context, index) => Image.network(product.images[index], fit: BoxFit.contain),
-                          )
-                        : const Center(child: Icon(Icons.image_not_supported_outlined, size: 80)),
-                  ),
+                // Hero image with badges overlay
+                Stack(
+                  children: [
+                    Hero(
+                      tag: product.id, // Ensure Hero tag matches if used elsewhere
+                      child: Container(
+                        color: Colors.grey.shade100,
+                        height: 300,
+                        child: product.images.isNotEmpty
+                            ? PageView.builder(
+                                itemCount: product.images.length,
+                                itemBuilder: (context, index) => Image.network(
+                                  product.images[index],
+                                  fit: BoxFit.contain,
+                                  loadingBuilder: (context, child, progress) {
+                                    if (progress == null) return child;
+                                    return Center(child: CircularProgressIndicator(value: progress.expectedTotalBytes != null ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes! : null));
+                                  },
+                                  errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.broken_image_outlined, size: 80)),
+                                ),
+                              )
+                            : const Center(child: Icon(Icons.image_not_supported_outlined, size: 80)),
+                      ),
+                    ),
+                    // Badges positioned on the image
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                           if (product.isNew)
+                             _buildBadge(context, 'جديد', Colors.blue.shade600, Icons.new_releases_outlined),
+                           if (product.isFeatured)
+                             _buildBadge(context, 'مميز', colorScheme.secondary, Icons.star_border_outlined),
+                           if (hasDiscount)
+                             _buildBadge(context, 'خصم!', colorScheme.error, Icons.local_offer_outlined),
+                          //  if (product.isFreeShipping)
+                          //    _buildBadge(context, 'شحن مجاني', Colors.green.shade600, Icons.local_shipping_outlined),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -105,13 +172,15 @@ class ProductDetailsPage extends StatelessWidget {
                       // Title + favorite
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: Text(
                               product.name,
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
+                          const SizedBox(width: 10),
                           FavoriteButton(productId: product.id),
                         ],
                       ),
@@ -120,21 +189,19 @@ class ProductDetailsPage extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            "${product.discountPrice ?? product.price} ر.س",
-                            style: TextStyle(
-                              fontSize: 22,
+                            "${product.discountPrice ?? product.price} جنيه",
+                            style: theme.textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: product.discountPrice != null ? Colors.red : Colors.black,
+                              color: hasDiscount ? colorScheme.error : colorScheme.onSurface,
                             ),
                           ),
-                          if (product.discountPrice != null)
+                          if (hasDiscount)
                             Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: Text(
-                                "${product.price} ر.س",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
+                                "${product.price} جنيه",
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: Colors.grey.shade600,
                                   decoration: TextDecoration.lineThrough,
                                 ),
                               ),
@@ -143,17 +210,17 @@ class ProductDetailsPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       // Description
-                      Text("الوصف", style: Theme.of(context).textTheme.titleMedium),
+                      Text("الوصف", style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
-                      Text(product.description, style: const TextStyle(fontSize: 15, color: Colors.black87)),
+                      Text(product.description, style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant)),
                       const SizedBox(height: 24),
                       const Divider(),
                       const SizedBox(height: 8),
-                      // Reviews
+                      // Reviews Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("المراجعات", style: Theme.of(context).textTheme.titleLarge),
+                          Text("المراجعات", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                           TextButton.icon(
                             onPressed: () => _showAddReviewDialog(context, product.id),
                             icon: const Icon(Icons.add_comment_outlined),
@@ -165,10 +232,16 @@ class ProductDetailsPage extends StatelessWidget {
                         stream: reviewService.getReviewsForProductStream(product.id),
                         builder: (context, reviewSnapshot) {
                           if (reviewSnapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20.0),
+                              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            );
                           }
                           if (reviewSnapshot.hasError || !reviewSnapshot.hasData) {
-                            return const Text("حدث خطأ أثناء تحميل المراجعات.");
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20.0),
+                              child: Text("حدث خطأ أثناء تحميل المراجعات."),
+                            );
                           }
 
                           final reviews = reviewSnapshot.data!;
@@ -183,22 +256,26 @@ class ProductDetailsPage extends StatelessWidget {
                                 children: [
                                   RatingBarIndicator(
                                     rating: avgRating,
-                                    itemBuilder: (context, _) => const Icon(Icons.star, color: Colors.amber),
+                                    itemBuilder: (context, _) => Icon(Icons.star, color: Colors.amber.shade600),
                                     itemCount: 5,
                                     itemSize: 20,
+                                    unratedColor: Colors.grey.shade300,
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text("(${avgRating.toStringAsFixed(1)} من 5) - ${reviews.length} مراجعة"),
+                                  const SizedBox(width: 8),
+                                  Text("(${avgRating.toStringAsFixed(1)}) ${reviews.length} مراجعة", style: theme.textTheme.bodyMedium),
                                 ],
                               ),
                               const SizedBox(height: 16),
                               if (reviews.isEmpty)
-                                const Text("لا توجد مراجعات حتى الآن.", style: TextStyle(color: Colors.grey)),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                                  child: Center(child: Text("لا توجد مراجعات حتى الآن.", style: TextStyle(color: Colors.grey))),
+                                ),
                               ListView.separated(
                                 itemCount: reviews.length,
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                separatorBuilder: (_, __) => const Divider(height: 24, thickness: 0.5),
                                 itemBuilder: (context, index) => ReviewCard(review: reviews[index]),
                               ),
                             ],
@@ -216,3 +293,4 @@ class ProductDetailsPage extends StatelessWidget {
     );
   }
 }
+

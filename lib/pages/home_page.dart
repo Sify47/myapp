@@ -51,18 +51,18 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Search Bar
-              SearchBarWidget(
-                onSearch: (query) {
-                  // Navigate to search results
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      // builder: (_) => CatalogPage(searchQuery: query),
-                        builder: (_) => CatalogPage(),
-                    ),
-                  );
-                },
-              ),
+              // SearchBarWidget(
+              //   onSearch: (query) {
+              //     // Navigate to search results
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         // builder: (_) => CatalogPage(searchQuery: query),
+              //           builder: (_) => CatalogPage(),
+              //       ),
+              //     );
+              //   },
+              // ),
               
               // Featured Offers Carousel
               _buildFeaturedOffers(context),
@@ -102,128 +102,123 @@ class HomePage extends StatelessWidget {
   
   // Featured Offers Carousel
   Widget _buildFeaturedOffers(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('offers')
-          // .orderBy('createdAt', descending: true)
-          .limit(5)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox(
-            height: 200,
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        
-        final offers = snapshot.data!.docs;
-        
-        return SizedBox(
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('products')
+        //.orderBy('createdAt', descending: true)  // لو حابب ترتيب حسب تاريخ الإضافة
+        .where('isFeatured', isEqualTo: true)
+        .limit(5)
+        .snapshots(),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData) {
+        return const SizedBox(
           height: 200,
-          child: PageView.builder(
-            itemCount: offers.length,
-            controller: PageController(viewportFraction: 0.9),
-            itemBuilder: (context, index) {
-              final offer = offers[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => OfferDetailsPage(
-                        title: offer['title'],
-                        imageUrl: offer['image'],
-                        description: offer['description'],
-                        expiry: offer['expiry'],
-                        category: offer['category'],
-                        offerCode: offer['offerCode'],
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    image: DecorationImage(
-                      image: NetworkImage(offer['image']),
-                      fit: BoxFit.cover,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Gradient overlay for better text visibility
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.7),
-                              Colors.transparent,
-                            ],
-                            stops: const [0.0, 0.7],
-                          ),
-                        ),
-                      ),
-                      
-                      // Offer title and description
-                      Positioned(
-                        bottom: 16,
-                        left: 16,
-                        right: 16,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              offer['title'],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'ينتهي في ${offer['expiry']}',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      // Favorite button
-                      Positioned(
-                        top: 12,
-                        right: 12,
-                        child: FavoriteButton(
-                          productId: offer.id,
-                          // offerData: offer.data() as Map<String, dynamic>,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+          child: Center(child: CircularProgressIndicator()),
         );
-      },
-    );
-  }
-  
+      }
+      
+      final products = snapshot.data!.docs;
+      
+      return SizedBox(
+        height: 200,
+        child: PageView.builder(
+          itemCount: products.length,
+          controller: PageController(viewportFraction: 0.9),
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProductDetailsPage(
+                      productId: product.id,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  image: DecorationImage(
+                    image: NetworkImage(product['images'][0]),
+                    fit: BoxFit.cover,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    // Gradient overlay for text visibility
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.7],
+                        ),
+                      ),
+                    ),
+
+                    // Product name and price
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product['name'],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${product['price'].toString()} ر.س',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Favorite button (لو تستخدمه مع المنتج)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: FavoriteButton(
+                        productId: product.id,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
   // Categories Section
   Widget _buildCategoriesSection(BuildContext context) {
     // Sample categories - in a real app, these would come from Firestore
