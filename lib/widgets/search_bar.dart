@@ -33,7 +33,7 @@ class SearchBarWidget extends StatelessWidget {
         autofocus: autofocus,
         decoration: InputDecoration(
           hintText: hintText,
-          prefixIcon: const Icon(Icons.search, color: Colors.orange),
+          prefixIcon: const Icon(Icons.search, color: Color(0xFF3366FF)),
           suffixIcon: IconButton(
             icon: const Icon(Icons.filter_list, color: Colors.grey),
             onPressed: () {

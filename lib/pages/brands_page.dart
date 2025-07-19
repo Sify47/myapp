@@ -66,6 +66,7 @@ class _BrandsPageState extends State<BrandsPage> {
                   insta: brand['instagram'] ?? '',
                   website: brand['website'] ?? '',
                   dec: brand['dec'] ?? '',
+                  // id: brand['dec'] ?? '',
                 ),
               ));
             },

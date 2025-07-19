@@ -56,6 +56,7 @@ class DefaultFirebaseOptions {
     projectId: 'wafrhaa',
     authDomain: 'wafrhaa.firebaseapp.com',
     storageBucket: 'wafrhaa.firebasestorage.app',
+    measurementId: 'G-RK7EHNC082',
   );
 
   static const FirebaseOptions android = FirebaseOptions(

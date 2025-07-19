@@ -87,11 +87,9 @@ class OfferDetailsPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                
                 Clipboard.setData(ClipboardData(text: offerCode));
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("تم نسخ الكود بنجاح")),
-                  
                 );
               },
               child: const Text(
@@ -111,7 +109,7 @@ class OfferDetailsPage extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
-        leading: Icon(icon, color: Colors.deepOrange),
+        leading: Icon(icon, color: Color(0xFF3366FF)),
         title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(value),
       ),

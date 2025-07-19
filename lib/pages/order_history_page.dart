@@ -12,9 +12,9 @@ class OrderHistoryPage extends StatelessWidget {
   Map<String, dynamic> _getStatusStyle(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return {'text': 'قيد الانتظار', 'color': Colors.orange};
+        return {'text': 'قيد الانتظار', 'color': Color(0xFF3366FF)};
       case 'processing':
-        return {'text': 'قيد المعالجة', 'color': Colors.blue};
+        return {'text': 'قيد المعالجة', 'color': Color(0xFF3366FF)};
       case 'shipped':
         return {'text': 'تم الشحن', 'color': Colors.purple};
       case 'delivered':
@@ -31,10 +31,7 @@ class OrderHistoryPage extends StatelessWidget {
     final orderService = Provider.of<OrderService>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('سجل الطلبات'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('سجل الطلبات'), centerTitle: true),
       body: StreamBuilder<List<Order>>(
         stream: orderService.getUserOrdersStream(),
         builder: (context, snapshot) {
@@ -61,14 +58,22 @@ class OrderHistoryPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final order = orders[index];
               final statusStyle = _getStatusStyle(order.orderStatus);
-              final formattedDate = DateFormat('yyyy-MM-dd – hh:mm a', 'en_US').format(order.createdAt.toDate()); // Arabic locale for date
+              final formattedDate = DateFormat(
+                'yyyy-MM-dd – hh:mm a',
+                'en_US',
+              ).format(order.createdAt.toDate()); // Arabic locale for date
 
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 elevation: 3,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 15.0,
+                  ),
                   title: Text(
                     'طلب رقم: ${order.id.substring(0, 8)}...', // Show partial ID
                     style: const TextStyle(fontWeight: FontWeight.bold),
@@ -79,20 +84,29 @@ class OrderHistoryPage extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text('التاريخ: $formattedDate'),
                       const SizedBox(height: 4),
-                      Text('المجموع: ${order.grandTotal.toStringAsFixed(2)} ر.س'),
+                      Text(
+                        'المجموع: ${order.grandTotal.toStringAsFixed(2)} ج.م',
+                      ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
                           const Text('الحالة: '),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: statusStyle['color'].withOpacity(0.1),
                               borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
                               statusStyle['text'],
-                              style: TextStyle(color: statusStyle['color'], fontWeight: FontWeight.w500, fontSize: 12),
+                              style: TextStyle(
+                                color: statusStyle['color'],
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ],
@@ -118,4 +132,3 @@ class OrderHistoryPage extends StatelessWidget {
     );
   }
 }
-

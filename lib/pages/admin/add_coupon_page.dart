@@ -21,7 +21,9 @@ class _AddCouponPageState extends State<AddCouponPage> {
   final _usageLimitController = TextEditingController();
 
   String _discountType = 'fixed_amount'; // Default
-  DateTime _expiryDate = DateTime.now().add(const Duration(days: 30)); // Default expiry
+  DateTime _expiryDate = DateTime.now().add(
+    const Duration(days: 30),
+  ); // Default expiry
   bool _isActive = true;
   bool _isLoading = false;
 
@@ -49,19 +51,24 @@ class _AddCouponPageState extends State<AddCouponPage> {
     final couponService = Provider.of<CouponService>(context, listen: false);
     final code = _codeController.text.trim().toUpperCase();
     final discountValue = double.tryParse(_discountValueController.text.trim());
-    final minimumSpend = _minimumSpendController.text.trim().isEmpty
-        ? null
-        : double.tryParse(_minimumSpendController.text.trim());
-    final usageLimit = _usageLimitController.text.trim().isEmpty
-        ? null
-        : int.tryParse(_usageLimitController.text.trim());
+    final minimumSpend =
+        _minimumSpendController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_minimumSpendController.text.trim());
+    final usageLimit =
+        _usageLimitController.text.trim().isEmpty
+            ? null
+            : int.tryParse(_usageLimitController.text.trim());
 
     if (discountValue == null) {
-       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('قيمة الخصم غير صالحة'), backgroundColor: Colors.red),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('قيمة الخصم غير صالحة'),
+          backgroundColor: Colors.red,
+        ),
       );
-       setState(() => _isLoading = false);
-       return;
+      setState(() => _isLoading = false);
+      return;
     }
 
     final newCoupon = Coupon(
@@ -81,12 +88,18 @@ class _AddCouponPageState extends State<AddCouponPage> {
     try {
       await couponService.addCoupon(newCoupon);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تمت إضافة الكوبون بنجاح'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('تمت إضافة الكوبون بنجاح'),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.pop(context); // Go back after successful addition
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل إضافة الكوبون: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('فشل إضافة الكوبون: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -96,10 +109,7 @@ class _AddCouponPageState extends State<AddCouponPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('إضافة كوبون جديد'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('إضافة كوبون جديد'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -109,23 +119,39 @@ class _AddCouponPageState extends State<AddCouponPage> {
             children: [
               TextFormField(
                 controller: _codeController,
-                decoration: const InputDecoration(labelText: 'رمز الكوبون (Code)'),
+                decoration: const InputDecoration(
+                  labelText: 'رمز الكوبون (Code)',
+                ),
                 textCapitalization: TextCapitalization.characters,
-                validator: (value) => value == null || value.trim().isEmpty ? 'رمز الكوبون مطلوب' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'رمز الكوبون مطلوب'
+                            : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(labelText: 'الوصف'),
-                validator: (value) => value == null || value.trim().isEmpty ? 'الوصف مطلوب' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'الوصف مطلوب'
+                            : null,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _discountType,
                 decoration: const InputDecoration(labelText: 'نوع الخصم'),
                 items: const [
-                  DropdownMenuItem(value: 'fixed_amount', child: Text('مبلغ ثابت')),
-                  DropdownMenuItem(value: 'percentage', child: Text('نسبة مئوية')),
+                  DropdownMenuItem(
+                    value: 'fixed_amount',
+                    child: Text('مبلغ ثابت'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'percentage',
+                    child: Text('نسبة مئوية'),
+                  ),
                 ],
                 onChanged: (value) => setState(() => _discountType = value!),
               ),
@@ -134,22 +160,29 @@ class _AddCouponPageState extends State<AddCouponPage> {
                 controller: _discountValueController,
                 decoration: InputDecoration(
                   labelText: 'قيمة الخصم',
-                  suffixText: _discountType == 'percentage' ? '%' : 'ر.س',
+                  suffixText: _discountType == 'percentage' ? '%' : 'ج.م',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) return 'قيمة الخصم مطلوبة';
-                  if (double.tryParse(value.trim()) == null) return 'قيمة غير صالحة';
+                  if (value == null || value.trim().isEmpty)
+                    return 'قيمة الخصم مطلوبة';
+                  if (double.tryParse(value.trim()) == null)
+                    return 'قيمة غير صالحة';
                   return null;
                 },
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _minimumSpendController,
-                decoration: const InputDecoration(labelText: 'الحد الأدنى للطلب (اختياري)', suffixText: 'ر.س'),
+                decoration: const InputDecoration(
+                  labelText: 'الحد الأدنى للطلب (اختياري)',
+                  suffixText: 'ج.م',
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value != null && value.trim().isNotEmpty && double.tryParse(value.trim()) == null) {
+                  if (value != null &&
+                      value.trim().isNotEmpty &&
+                      double.tryParse(value.trim()) == null) {
                     return 'قيمة غير صالحة';
                   }
                   return null;
@@ -158,10 +191,14 @@ class _AddCouponPageState extends State<AddCouponPage> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _usageLimitController,
-                decoration: const InputDecoration(labelText: 'حد الاستخدام الكلي (اختياري)'),
+                decoration: const InputDecoration(
+                  labelText: 'حد الاستخدام الكلي (اختياري)',
+                ),
                 keyboardType: TextInputType.number,
-                 validator: (value) {
-                  if (value != null && value.trim().isNotEmpty && int.tryParse(value.trim()) == null) {
+                validator: (value) {
+                  if (value != null &&
+                      value.trim().isNotEmpty &&
+                      int.tryParse(value.trim()) == null) {
                     return 'قيمة غير صالحة';
                   }
                   return null;
@@ -170,7 +207,9 @@ class _AddCouponPageState extends State<AddCouponPage> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Text('تاريخ الانتهاء: ${DateFormat('yyyy-MM-dd').format(_expiryDate)}'),
+                  Text(
+                    'تاريخ الانتهاء: ${DateFormat('yyyy-MM-dd').format(_expiryDate)}',
+                  ),
                   const Spacer(),
                   TextButton.icon(
                     icon: const Icon(Icons.calendar_today),
@@ -186,12 +225,13 @@ class _AddCouponPageState extends State<AddCouponPage> {
               ),
               const SizedBox(height: 20),
               Center(
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _submitCoupon,
-                        child: const Text('إضافة الكوبون'),
-                      ),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                          onPressed: _submitCoupon,
+                          child: const Text('إضافة الكوبون'),
+                        ),
               ),
             ],
           ),
@@ -200,4 +240,3 @@ class _AddCouponPageState extends State<AddCouponPage> {
     );
   }
 }
-

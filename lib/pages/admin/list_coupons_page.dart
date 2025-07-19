@@ -14,10 +14,7 @@ class ListCouponsPage extends StatelessWidget {
     final couponService = Provider.of<CouponService>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('إدارة الكوبونات'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('إدارة الكوبونات'), centerTitle: true),
       body: StreamBuilder<List<Coupon>>(
         stream: couponService.getAllCouponsStream(),
         builder: (context, snapshot) {
@@ -37,34 +34,53 @@ class ListCouponsPage extends StatelessWidget {
             itemCount: coupons.length,
             itemBuilder: (context, index) {
               final coupon = coupons[index];
-              final expiryFormatted = DateFormat('yyyy-MM-dd').format(coupon.expiryDate.toDate());
+              final expiryFormatted = DateFormat(
+                'yyyy-MM-dd',
+              ).format(coupon.expiryDate.toDate());
               final isValid = coupon.isValid;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: ListTile(
-                  title: Text(coupon.code, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    coupon.code,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(coupon.description),
-                      Text('النوع: ${coupon.discountType == 'percentage' ? 'نسبة' : 'مبلغ ثابت'} - القيمة: ${coupon.discountValue}${coupon.discountType == 'percentage' ? '%' : ' ر.س'}'),
-                      Text('الانتهاء: $expiryFormatted - فعال: ${coupon.isActive ? 'نعم' : 'لا'}'),
-                      Text('الاستخدام: ${coupon.currentUsage}/${coupon.usageLimit ?? 'غير محدود'}'),
+                      Text(
+                        'النوع: ${coupon.discountType == 'percentage' ? 'نسبة' : 'مبلغ ثابت'} - القيمة: ${coupon.discountValue}${coupon.discountType == 'percentage' ? '%' : ' ج.م'}',
+                      ),
+                      Text(
+                        'الانتهاء: $expiryFormatted - فعال: ${coupon.isActive ? 'نعم' : 'لا'}',
+                      ),
+                      Text(
+                        'الاستخدام: ${coupon.currentUsage}/${coupon.usageLimit ?? 'غير محدود'}',
+                      ),
                       if (!isValid)
-                        const Text('غير صالح حالياً', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'غير صالح حالياً',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                     ],
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        icon: const Icon(Icons.edit, color: Color(0xFF3366FF)),
                         tooltip: 'تعديل',
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => EditCouponForm(coupon: coupon)),
+                            MaterialPageRoute(
+                              builder: (_) => EditCouponForm(coupon: coupon),
+                            ),
                           );
                         },
                       ),
@@ -75,31 +91,45 @@ class ListCouponsPage extends StatelessWidget {
                           // Show confirmation dialog before deleting
                           final confirm = await showDialog<bool>(
                             context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('تأكيد الحذف'),
-                              content: Text('هل أنت متأكد من رغبتك في حذف الكوبون ${coupon.code}؟'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('إلغاء'),
+                            builder:
+                                (context) => AlertDialog(
+                                  title: const Text('تأكيد الحذف'),
+                                  content: Text(
+                                    'هل أنت متأكد من رغبتك في حذف الكوبون ${coupon.code}؟',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, false),
+                                      child: const Text('إلغاء'),
+                                    ),
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.pop(context, true),
+                                      child: const Text(
+                                        'حذف',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('حذف', style: TextStyle(color: Colors.red)),
-                                ),
-                              ],
-                            ),
                           );
 
                           if (confirm == true) {
                             try {
                               await couponService.deleteCoupon(coupon.id);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('تم حذف الكوبون بنجاح'), backgroundColor: Colors.green),
+                                const SnackBar(
+                                  content: Text('تم حذف الكوبون بنجاح'),
+                                  backgroundColor: Colors.green,
+                                ),
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('فشل حذف الكوبون: $e'), backgroundColor: Colors.red),
+                                SnackBar(
+                                  content: Text('فشل حذف الكوبون: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
                               );
                             }
                           }
@@ -127,4 +157,3 @@ class ListCouponsPage extends StatelessWidget {
     );
   }
 }
-

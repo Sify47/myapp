@@ -8,26 +8,36 @@ class UpdateOfferPage extends StatelessWidget {
   Future<void> _deleteOffer(BuildContext context, String offerId) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('تأكيد الحذف'),
-        content: const Text('هل أنت متأكد من حذف هذا العرض؟'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('حذف')),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('تأكيد الحذف'),
+            content: const Text('هل أنت متأكد من حذف هذا العرض؟'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('إلغاء'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('حذف'),
+              ),
+            ],
+          ),
     );
 
     if (confirm == true) {
       try {
-        await FirebaseFirestore.instance.collection('offers').doc(offerId).delete();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم حذف العرض بنجاح')),
-        );
+        await FirebaseFirestore.instance
+            .collection('offers')
+            .doc(offerId)
+            .delete();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('تم حذف العرض بنجاح')));
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ أثناء الحذف: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء الحذف: $e')));
       }
     }
   }
@@ -58,7 +68,9 @@ class UpdateOfferPage extends StatelessWidget {
                   width: 50,
                   height: 50,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported),
+                  errorBuilder:
+                      (context, error, stackTrace) =>
+                          const Icon(Icons.image_not_supported),
                 ),
                 title: Text(offer['title']),
                 subtitle: Text('Code: ${offer['offerCode']}'),
@@ -66,12 +78,16 @@ class UpdateOfferPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      icon: const Icon(Icons.edit, color: Color(0xFF3366FF)),
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => EditOfferForm(offerId: offer.id, initialData: offer),
+                            builder:
+                                (_) => EditOfferForm(
+                                  offerId: offer.id,
+                                  initialData: offer,
+                                ),
                           ),
                         );
                       },

@@ -46,7 +46,6 @@ class NotificationService {
 
       if (message.notification != null) {
         print('Message also contained a notification: ${message.notification}');
-        // TODO: Display the notification using a local notifications package (e.g., flutter_local_notifications)
         // Or update the UI directly if needed
       }
     });
@@ -57,7 +56,6 @@ class NotificationService {
     // Handle notification tap when app is terminated/background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
-      // TODO: Navigate to a specific screen based on message data
       // e.g., if it's an order update, navigate to the order details page
     });
 
@@ -65,7 +63,6 @@ class NotificationService {
     RemoteMessage? initialMessage = await _firebaseMessaging.getInitialMessage();
     if (initialMessage != null) {
        print('App opened from terminated state via notification!');
-       // TODO: Handle initial message navigation
     }
 
   }
@@ -106,7 +103,6 @@ class NotificationService {
     }
   }
 
-  // TODO: Add method to remove token on logout if needed
   Future<void> removeDeviceToken() async {
      final user = _auth.currentUser;
      if (user == null) return;

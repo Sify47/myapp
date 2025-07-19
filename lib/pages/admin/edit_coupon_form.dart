@@ -30,10 +30,18 @@ class _EditCouponFormState extends State<EditCouponForm> {
   void initState() {
     super.initState();
     // Initialize controllers and state with existing coupon data
-    _descriptionController = TextEditingController(text: widget.coupon.description);
-    _discountValueController = TextEditingController(text: widget.coupon.discountValue.toString());
-    _minimumSpendController = TextEditingController(text: widget.coupon.minimumSpend?.toString() ?? '');
-    _usageLimitController = TextEditingController(text: widget.coupon.usageLimit?.toString() ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.coupon.description,
+    );
+    _discountValueController = TextEditingController(
+      text: widget.coupon.discountValue.toString(),
+    );
+    _minimumSpendController = TextEditingController(
+      text: widget.coupon.minimumSpend?.toString() ?? '',
+    );
+    _usageLimitController = TextEditingController(
+      text: widget.coupon.usageLimit?.toString() ?? '',
+    );
     _discountType = widget.coupon.discountType;
     _expiryDate = widget.coupon.expiryDate.toDate();
     _isActive = widget.coupon.isActive;
@@ -43,7 +51,9 @@ class _EditCouponFormState extends State<EditCouponForm> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _expiryDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)), // Allow past dates for viewing/editing
+      firstDate: DateTime.now().subtract(
+        const Duration(days: 365),
+      ), // Allow past dates for viewing/editing
       lastDate: DateTime(2101),
     );
     if (picked != null && picked != _expiryDate) {
@@ -62,19 +72,24 @@ class _EditCouponFormState extends State<EditCouponForm> {
 
     final couponService = Provider.of<CouponService>(context, listen: false);
     final discountValue = double.tryParse(_discountValueController.text.trim());
-    final minimumSpend = _minimumSpendController.text.trim().isEmpty
-        ? null
-        : double.tryParse(_minimumSpendController.text.trim());
-    final usageLimit = _usageLimitController.text.trim().isEmpty
-        ? null
-        : int.tryParse(_usageLimitController.text.trim());
+    final minimumSpend =
+        _minimumSpendController.text.trim().isEmpty
+            ? null
+            : double.tryParse(_minimumSpendController.text.trim());
+    final usageLimit =
+        _usageLimitController.text.trim().isEmpty
+            ? null
+            : int.tryParse(_usageLimitController.text.trim());
 
-     if (discountValue == null) {
-       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('قيمة الخصم غير صالحة'), backgroundColor: Colors.red),
+    if (discountValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('قيمة الخصم غير صالحة'),
+          backgroundColor: Colors.red,
+        ),
       );
-       setState(() => _isLoading = false);
-       return;
+      setState(() => _isLoading = false);
+      return;
     }
 
     // Create updated Coupon object
@@ -95,12 +110,18 @@ class _EditCouponFormState extends State<EditCouponForm> {
     try {
       await couponService.updateCoupon(updatedCoupon);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم تحديث الكوبون بنجاح'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('تم تحديث الكوبون بنجاح'),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.pop(context); // Go back after successful update
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('فشل تحديث الكوبون: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('فشل تحديث الكوبون: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -122,20 +143,33 @@ class _EditCouponFormState extends State<EditCouponForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Code is usually not editable, display it
-              Text('رمز الكوبون: ${widget.coupon.code}', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'رمز الكوبون: ${widget.coupon.code}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(labelText: 'الوصف'),
-                validator: (value) => value == null || value.trim().isEmpty ? 'الوصف مطلوب' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'الوصف مطلوب'
+                            : null,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _discountType,
                 decoration: const InputDecoration(labelText: 'نوع الخصم'),
                 items: const [
-                  DropdownMenuItem(value: 'fixed_amount', child: Text('مبلغ ثابت')),
-                  DropdownMenuItem(value: 'percentage', child: Text('نسبة مئوية')),
+                  DropdownMenuItem(
+                    value: 'fixed_amount',
+                    child: Text('مبلغ ثابت'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'percentage',
+                    child: Text('نسبة مئوية'),
+                  ),
                 ],
                 onChanged: (value) => setState(() => _discountType = value!),
               ),
@@ -144,22 +178,29 @@ class _EditCouponFormState extends State<EditCouponForm> {
                 controller: _discountValueController,
                 decoration: InputDecoration(
                   labelText: 'قيمة الخصم',
-                  suffixText: _discountType == 'percentage' ? '%' : 'ر.س',
+                  suffixText: _discountType == 'percentage' ? '%' : 'ج.م',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) return 'قيمة الخصم مطلوبة';
-                  if (double.tryParse(value.trim()) == null) return 'قيمة غير صالحة';
+                  if (value == null || value.trim().isEmpty)
+                    return 'قيمة الخصم مطلوبة';
+                  if (double.tryParse(value.trim()) == null)
+                    return 'قيمة غير صالحة';
                   return null;
                 },
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _minimumSpendController,
-                decoration: const InputDecoration(labelText: 'الحد الأدنى للطلب (اختياري)', suffixText: 'ر.س'),
+                decoration: const InputDecoration(
+                  labelText: 'الحد الأدنى للطلب (اختياري)',
+                  suffixText: 'ج.م',
+                ),
                 keyboardType: TextInputType.number,
-                 validator: (value) {
-                  if (value != null && value.trim().isNotEmpty && double.tryParse(value.trim()) == null) {
+                validator: (value) {
+                  if (value != null &&
+                      value.trim().isNotEmpty &&
+                      double.tryParse(value.trim()) == null) {
                     return 'قيمة غير صالحة';
                   }
                   return null;
@@ -168,10 +209,14 @@ class _EditCouponFormState extends State<EditCouponForm> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _usageLimitController,
-                decoration: const InputDecoration(labelText: 'حد الاستخدام الكلي (اختياري)'),
+                decoration: const InputDecoration(
+                  labelText: 'حد الاستخدام الكلي (اختياري)',
+                ),
                 keyboardType: TextInputType.number,
-                 validator: (value) {
-                  if (value != null && value.trim().isNotEmpty && int.tryParse(value.trim()) == null) {
+                validator: (value) {
+                  if (value != null &&
+                      value.trim().isNotEmpty &&
+                      int.tryParse(value.trim()) == null) {
                     return 'قيمة غير صالحة';
                   }
                   return null;
@@ -180,7 +225,9 @@ class _EditCouponFormState extends State<EditCouponForm> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Text('تاريخ الانتهاء: ${DateFormat('yyyy-MM-dd').format(_expiryDate)}'),
+                  Text(
+                    'تاريخ الانتهاء: ${DateFormat('yyyy-MM-dd').format(_expiryDate)}',
+                  ),
                   const Spacer(),
                   TextButton.icon(
                     icon: const Icon(Icons.calendar_today),
@@ -196,12 +243,13 @@ class _EditCouponFormState extends State<EditCouponForm> {
               ),
               const SizedBox(height: 20),
               Center(
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _submitUpdate,
-                        child: const Text('تحديث الكوبون'),
-                      ),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                          onPressed: _submitUpdate,
+                          child: const Text('تحديث الكوبون'),
+                        ),
               ),
             ],
           ),
@@ -210,4 +258,3 @@ class _EditCouponFormState extends State<EditCouponForm> {
     );
   }
 }
-

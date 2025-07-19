@@ -31,7 +31,8 @@ class _AddOfferPageState extends State<AddOfferPage> {
 
   Future<void> fetchBrands() async {
     try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('brands').get();
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('brands').get();
       setState(() {
         _brands = snapshot.docs.map((doc) => doc['name'].toString()).toList();
       });
@@ -75,10 +76,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('حدث خطأ: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('حدث خطأ: $e'), backgroundColor: Colors.red),
         );
       } finally {
         setState(() => _isLoading = false);
@@ -86,16 +84,21 @@ class _AddOfferPageState extends State<AddOfferPage> {
     }
   }
 
-  Widget _buildField(TextEditingController controller, String label, IconData icon, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildField(
+    TextEditingController controller,
+    String label,
+    IconData icon, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.orange),
+          prefixIcon: Icon(icon, color: Color(0xFF3366FF)),
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.orange),
+          labelStyle: const TextStyle(color: Color(0xFF3366FF)),
           filled: true,
           fillColor: Colors.grey[100],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -119,9 +122,9 @@ class _AddOfferPageState extends State<AddOfferPage> {
       padding: const EdgeInsets.only(bottom: 20),
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.business, color: Colors.orange),
+          prefixIcon: const Icon(Icons.business, color: Color(0xFF3366FF)),
           labelText: 'اختر البراند',
-          labelStyle: const TextStyle(color: Colors.orange),
+          labelStyle: const TextStyle(color: Color(0xFF3366FF)),
           filled: true,
           fillColor: Colors.grey[100],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -131,9 +134,10 @@ class _AddOfferPageState extends State<AddOfferPage> {
           ),
         ),
         value: _selectedBrand,
-        items: _brands.map((name) {
-          return DropdownMenuItem(value: name, child: Text(name));
-        }).toList(),
+        items:
+            _brands.map((name) {
+              return DropdownMenuItem(value: name, child: Text(name));
+            }).toList(),
         onChanged: (value) {
           setState(() {
             _selectedBrand = value;
@@ -151,7 +155,7 @@ class _AddOfferPageState extends State<AddOfferPage> {
         title: const Text('إضافة عرض جديد'),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(color: Colors.orange),
+          decoration: const BoxDecoration(color: Color(0xFF3366FF)),
         ),
         elevation: 0,
       ),
@@ -162,7 +166,9 @@ class _AddOfferPageState extends State<AddOfferPage> {
         child: Center(
           child: Card(
             elevation: 6,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Form(
@@ -172,7 +178,11 @@ class _AddOfferPageState extends State<AddOfferPage> {
                   children: [
                     const Text(
                       'تفاصيل العرض',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.teal,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
@@ -181,23 +191,28 @@ class _AddOfferPageState extends State<AddOfferPage> {
                     _buildField(_imageController, 'رابط الصورة', Icons.image),
                     _buildField(_categoryController, 'التصنيف', Icons.category),
                     _buildField(_offerCodeController, 'كود العرض', Icons.code),
-                    _buildField(_expiryController, 'تاريخ الانتهاء (مثال: 2025-06-01)', Icons.date_range, keyboardType: TextInputType.datetime),
+                    _buildField(
+                      _expiryController,
+                      'تاريخ الانتهاء (مثال: 2025-06-01)',
+                      Icons.date_range,
+                      keyboardType: TextInputType.datetime,
+                    ),
                     _buildDropdown(),
                     _isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : ElevatedButton.icon(
-                            onPressed: _submitOffer,
-                            icon: const Icon(Icons.add),
-                            label: const Text('إضافة العرض'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              textStyle: const TextStyle(fontSize: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                          onPressed: _submitOffer,
+                          icon: const Icon(Icons.add),
+                          label: const Text('إضافة العرض'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF3366FF),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            textStyle: const TextStyle(fontSize: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
+                        ),
                   ],
                 ),
               ),

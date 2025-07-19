@@ -105,7 +105,7 @@ class UpdateBrandPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      icon: const Icon(Icons.edit, color: Color(0xFF3366FF)),
                       onPressed: () {
                         // هنا افتح صفحة تعديل البراند (لو عندك نموذج تعديل)
                         Navigator.push(

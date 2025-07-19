@@ -48,6 +48,7 @@ class CartService {
         final newItem = CartItem(
           productId: product.id,
           productName: product.name,
+          brandId: product.brandId,
           productImageUrl: imageUrl,
           quantity: quantity,
           price: product.price, // Price when added

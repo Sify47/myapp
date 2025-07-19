@@ -9,6 +9,7 @@ class OrderItem extends CartItem {
   OrderItem({
     required super.productId,
     required super.productName,
+    required super.brandId,
     super.productImageUrl,
     required super.quantity,
     required super.price, // Price at the time of order
@@ -22,6 +23,7 @@ class OrderItem extends CartItem {
     return OrderItem(
       productId: data['productId'] ?? '',
       productName: data['productName'] ?? '',
+      brandId: data['brandId'] ?? '',
       productImageUrl: data['productImageUrl'],
       quantity: data['quantity'] ?? 0,
       price: (data['price'] ?? 0.0).toDouble(),
@@ -42,6 +44,7 @@ class OrderItem extends CartItem {
 class Order {
   final String id; // Firestore document ID
   final String userId;
+  final String brandId;
   final List<OrderItem> items;
   final double totalAmount; // Sum of item prices * quantity (before discount)
   final double shippingCost;
@@ -59,6 +62,7 @@ class Order {
   Order({
     required this.id,
     required this.userId,
+    required this.brandId,
     required this.items,
     required this.totalAmount,
     required this.shippingCost,
@@ -83,6 +87,7 @@ class Order {
       items: (data['items'] as List<dynamic>? ?? [])
           .map((itemData) => OrderItem.fromMap(itemData as Map<String, dynamic>))
           .toList(),
+      brandId: data['brandId'] ?? '',
       totalAmount: (data['totalAmount'] ?? 0.0).toDouble(),
       shippingCost: (data['shippingCost'] ?? 0.0).toDouble(),
       appliedCouponCode: data['appliedCouponCode'], // New field
@@ -103,6 +108,7 @@ class Order {
     return {
       'userId': userId,
       'items': items.map((item) => item.toMap()).toList(),
+      'brandId': brandId,
       'totalAmount': totalAmount,
       'shippingCost': shippingCost,
       'appliedCouponCode': appliedCouponCode, // New field

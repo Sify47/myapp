@@ -51,10 +51,7 @@ class _AddBrandPageState extends State<AddBrandPage> {
         Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('حدث خطأ: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('حدث خطأ: $e'), backgroundColor: Colors.red),
         );
       }
 
@@ -69,9 +66,7 @@ class _AddBrandPageState extends State<AddBrandPage> {
         title: const Text('إضافة براند'),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Colors.orange,
-          ),
+          decoration: const BoxDecoration(color: Color(0xFF3366FF)),
         ),
         elevation: 0,
       ),
@@ -82,7 +77,9 @@ class _AddBrandPageState extends State<AddBrandPage> {
         child: Center(
           child: Card(
             elevation: 6,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Form(
@@ -92,7 +89,11 @@ class _AddBrandPageState extends State<AddBrandPage> {
                   children: [
                     const Text(
                       'تفاصيل البراند',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.teal,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
@@ -100,25 +101,29 @@ class _AddBrandPageState extends State<AddBrandPage> {
                     _buildField(imageController, 'رابط الصورة', Icons.image),
                     _buildField(descController, 'الوصف', Icons.description),
                     _buildField(facebookController, 'Facebook', Icons.facebook),
-                    _buildField(xController, 'X (تويتر)', Icons.alternate_email),
+                    _buildField(
+                      xController,
+                      'X (تويتر)',
+                      Icons.alternate_email,
+                    ),
                     _buildField(instaController, 'Instagram', Icons.camera_alt),
                     _buildField(websiteController, 'Website', Icons.link),
                     const SizedBox(height: 30),
                     _isLoading
                         ? const Center(child: CircularProgressIndicator())
                         : ElevatedButton.icon(
-                            onPressed: _addBrand,
-                            icon: const Icon(Icons.add),
-                            label: const Text('إضافة البراند'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              textStyle: const TextStyle(fontSize: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                          onPressed: _addBrand,
+                          icon: const Icon(Icons.add),
+                          label: const Text('إضافة البراند'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF3366FF),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            textStyle: const TextStyle(fontSize: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
+                        ),
                   ],
                 ),
               ),
@@ -129,15 +134,19 @@ class _AddBrandPageState extends State<AddBrandPage> {
     );
   }
 
-  Widget _buildField(TextEditingController controller, String label, IconData icon) {
+  Widget _buildField(
+    TextEditingController controller,
+    String label,
+    IconData icon,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.orange),
+          prefixIcon: Icon(icon, color: Color(0xFF3366FF)),
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.orange),
+          labelStyle: const TextStyle(color: Color(0xFF3366FF)),
           filled: true,
           fillColor: Colors.grey[100],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

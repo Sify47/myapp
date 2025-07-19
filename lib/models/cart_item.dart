@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CartItem {
   final String productId;
   final String productName; // Store name for easier display
+  final String brandId;
   final String? productImageUrl; // Store main image URL
   final int quantity;
   final double price; // Price at the time of adding to cart
@@ -13,6 +14,7 @@ class CartItem {
   CartItem({
     required this.productId,
     required this.productName,
+    required this.brandId,
     this.productImageUrl,
     required this.quantity,
     required this.price,
@@ -26,6 +28,7 @@ class CartItem {
     return CartItem(
       productId: data['productId'] ?? '',
       productName: data['productName'] ?? '',
+      brandId: data['brandId'] ?? '',
       productImageUrl: data['productImageUrl'],
       quantity: data['quantity'] ?? 0,
       price: (data['price'] ?? 0.0).toDouble(),
@@ -40,6 +43,7 @@ class CartItem {
     return {
       'productId': productId,
       'productName': productName,
+      'brandId' : brandId,
       'productImageUrl': productImageUrl,
       'quantity': quantity,
       'price': price,

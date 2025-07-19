@@ -20,11 +20,11 @@ class _MainPageState extends State<MainPage> {
 
   // Updated list of pages for the new navigation bar
   final List<Widget> _pages = [
-    const HomePage(),     // 0: Home
-    const CatalogPage(),  // 1: Shop (Catalog)
-    const OffersPage(),   // 2: Offers
-    const CartPage(),     // 3: Cart
-    const AccountPage(),  // 4: Account
+    const HomePage(), // 0: Home
+    const CatalogPage(cat: 'الكل',), // 1: Shop (Catalog)
+    const OffersPage(), // 2: Offers
+    const CartPage(), // 3: Cart
+    const AccountPage(), // 4: Account
   ];
 
   @override
@@ -33,9 +33,10 @@ class _MainPageState extends State<MainPage> {
     final cartService = Provider.of<CartService>(context, listen: false);
 
     return Scaffold(
-      body: IndexedStack( // Use IndexedStack to keep state of pages
-         index: _currentIndex,
-         children: _pages,
+      body: IndexedStack(
+        // Use IndexedStack to keep state of pages
+        index: _currentIndex,
+        children: _pages,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -54,7 +55,10 @@ class _MainPageState extends State<MainPage> {
           type: BottomNavigationBarType.fixed, // Ensure all items are visible
           selectedItemColor: Theme.of(context).primaryColor,
           unselectedItemColor: Colors.grey,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
           unselectedLabelStyle: const TextStyle(fontSize: 11),
           backgroundColor: Colors.white,
           elevation: 0, // No elevation as we're using a custom shadow
@@ -62,17 +66,17 @@ class _MainPageState extends State<MainPage> {
             const BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
               activeIcon: Icon(Icons.home),
-              label: 'الرئيسية',
+              label: 'Home',
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.store_outlined),
               activeIcon: Icon(Icons.store),
-              label: 'المتجر',
+              label: 'Shop',
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.local_offer_outlined),
               activeIcon: Icon(Icons.local_offer),
-              label: 'العروض',
+              label: 'Offer',
             ),
             // Use StreamBuilder to listen for cart changes and update the badge
             BottomNavigationBarItem(
@@ -91,25 +95,25 @@ class _MainPageState extends State<MainPage> {
                 },
               ),
               activeIcon: StreamBuilder<List<CartItem>>(
-                 stream: cartService.getCartItemsStream(),
-                 builder: (context, snapshot) {
-                   final items = snapshot.data ?? [];
-                   return Badge(
-                     isLabelVisible: items.isNotEmpty,
-                     label: Text(
-                       items.length.toString(),
-                       style: const TextStyle(color: Colors.white, fontSize: 10),
-                     ),
-                     child: const Icon(Icons.shopping_bag),
-                   );
-                 },
+                stream: cartService.getCartItemsStream(),
+                builder: (context, snapshot) {
+                  final items = snapshot.data ?? [];
+                  return Badge(
+                    isLabelVisible: items.isNotEmpty,
+                    label: Text(
+                      items.length.toString(),
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                    ),
+                    child: const Icon(Icons.shopping_bag),
+                  );
+                },
               ),
-              label: 'السلة',
+              label: 'Cart',
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),
-              label: 'حسابي',
+              label: 'Account',
             ),
           ],
         ),
@@ -117,4 +121,3 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-

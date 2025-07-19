@@ -11,7 +11,7 @@ class FeatureBanner extends StatelessWidget {
     required this.title,
     required this.description,
     required this.icon,
-    this.color = Colors.orange,
+    this.color = Colors.blue,
   });
 
   @override
@@ -48,10 +48,7 @@ class FeatureBanner extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                 ),
               ],
             ),

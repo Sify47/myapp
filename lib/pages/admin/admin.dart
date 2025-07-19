@@ -19,15 +19,51 @@ class AdminPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Updated admin options to include coupon management
     final List<Map<String, dynamic>> adminOptions = [
-      {'title': 'Add Brand', 'icon': Icons.add_business, 'page': const AddBrandPage()},
-      {'title': 'Update Brand', 'icon': Icons.edit_note, 'page': const UpdateBrandPage()},
-      {'title': 'Add Offer', 'icon': Icons.add_box, 'page': const AddOfferPage()},
-      {'title': 'Update Offer', 'icon': Icons.edit_calendar, 'page': const UpdateOfferPage()},
-      {'title': 'Add Product', 'icon': Icons.add_shopping_cart, 'page': const AddProductPage()},
-      {'title': 'Update Product', 'icon': Icons.edit, 'page': const ListProductsPage()},
-      {'title': 'Manage Coupons', 'icon': Icons.discount, 'page': const ListCouponsPage()},
-      {'title': 'Reports', 'icon': Icons.bar_chart, 'page': const ReportsPage()},
-      {'title': 'Orders', 'icon': Icons.bar_chart, 'page': const ManageOrdersPage()},
+      {
+        'title': 'Add Brand',
+        'icon': Icons.add_business,
+        'page': const AddBrandPage(),
+      },
+      {
+        'title': 'Update Brand',
+        'icon': Icons.edit_note,
+        'page': const UpdateBrandPage(),
+      },
+      {
+        'title': 'Add Offer',
+        'icon': Icons.add_box,
+        'page': const AddOfferPage(),
+      },
+      {
+        'title': 'Update Offer',
+        'icon': Icons.edit_calendar,
+        'page': const UpdateOfferPage(),
+      },
+      {
+        'title': 'Add Product',
+        'icon': Icons.add_shopping_cart,
+        'page': const AddProductPage(),
+      },
+      {
+        'title': 'Update Product',
+        'icon': Icons.edit,
+        'page': const ListProductsPage(),
+      },
+      {
+        'title': 'Manage Coupons',
+        'icon': Icons.discount,
+        'page': const ListCouponsPage(),
+      },
+      {
+        'title': 'Reports',
+        'icon': Icons.bar_chart,
+        'page': const ReportsPage(),
+      },
+      {
+        'title': 'Orders',
+        'icon': Icons.bar_chart,
+        'page': const ManageOrdersPage(),
+      },
     ];
     final auth = Provider.of<AuthModel>(context);
 
@@ -35,7 +71,9 @@ class AdminPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Admin Panel'),
         centerTitle: true,
-        flexibleSpace: Container(decoration: const BoxDecoration(color: Colors.orange)),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(color: Color(0xFF3366FF)),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -63,23 +101,34 @@ class AdminPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = adminOptions[index];
           return GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => item['page']),
-            ),
+            onTap:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => item['page']),
+                ),
             child: Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.orange.shade50, // Lighter shade for card
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Color(0xFF3366FF), // Lighter shade for card
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(item['icon'], size: 40, color: Colors.orange.shade800),
+                  Icon(
+                    item['icon'],
+                    size: 40,
+                    color: Color(0xFF3366FF),
+                  ),
                   const SizedBox(height: 10),
                   Text(
                     item['title'],
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
                 ],
               ),
@@ -90,4 +139,3 @@ class AdminPage extends StatelessWidget {
     );
   }
 }
-

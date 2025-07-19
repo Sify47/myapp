@@ -26,16 +26,16 @@ class ReviewService {
     }
 
     // Optional: Check if user has already reviewed this product
-    // final existingReview = await _firestore
-    //     .collection('products')
-    //     .doc(productId)
-    //     .collection('reviews')
-    //     .where('userId', isEqualTo: user.uid)
-    //     .limit(1)
-    //     .get();
-    // if (existingReview.docs.isNotEmpty) {
-    //   throw Exception('You have already reviewed this product.');
-    // }
+    final existingReview = await _firestore
+        .collection('products')
+        .doc(productId)
+        .collection('reviews')
+        .where('userId', isEqualTo: user.uid)
+        .limit(1)
+        .get();
+    if (existingReview.docs.isNotEmpty) {
+      throw Exception('You have already reviewed this product.');
+    }
 
     // Optional: Fetch user's display name (consider storing it during signup/profile update)
     // For simplicity, using email or a placeholder if display name is null
@@ -58,37 +58,37 @@ class ReviewService {
 
     // Optional: Update the product's average rating and review count
     // This is better done using Cloud Functions for atomicity and scalability
-    // await _updateProductRating(productId);
+    await _updateProductRating(productId);
   }
 
   // --- Helper for updating product rating (Better implemented in Cloud Functions) ---
-  // Future<void> _updateProductRating(String productId) async {
-  //   final reviewsSnapshot = await _firestore
-  //       .collection('products')
-  //       .doc(productId)
-  //       .collection('reviews')
-  //       // .where('isApproved', isEqualTo: true) // Only count approved reviews
-  //       .get();
+  Future<void> _updateProductRating(String productId) async {
+    final reviewsSnapshot = await _firestore
+        .collection('products')
+        .doc(productId)
+        .collection('reviews')
+        // .where('isApproved', isEqualTo: true) // Only count approved reviews
+        .get();
 
-  //   if (reviewsSnapshot.docs.isEmpty) {
-  //     await _firestore.collection('products').doc(productId).update({
-  //       'averageRating': 0.0,
-  //       'reviewCount': 0,
-  //     });
-  //     return;
-  //   }
+    if (reviewsSnapshot.docs.isEmpty) {
+      await _firestore.collection('products').doc(productId).update({
+        'averageRating': 0.0,
+        'reviewCount': 0,
+      });
+      return;
+    }
 
-  //   double totalRating = 0;
-  //   for (var doc in reviewsSnapshot.docs) {
-  //     totalRating += (doc.data()['rating'] ?? 0.0).toDouble();
-  //   }
-  //   double averageRating = totalRating / reviewsSnapshot.docs.length;
-  //   int reviewCount = reviewsSnapshot.docs.length;
+    double totalRating = 0;
+    for (var doc in reviewsSnapshot.docs) {
+      totalRating += (doc.data()['rating'] ?? 0.0).toDouble();
+    }
+    double averageRating = totalRating / reviewsSnapshot.docs.length;
+    int reviewCount = reviewsSnapshot.docs.length;
 
-  //   await _firestore.collection('products').doc(productId).update({
-  //     'averageRating': double.parse(averageRating.toStringAsFixed(1)), // Store with 1 decimal place
-  //     'reviewCount': reviewCount,
-  //   });
-  // }
+    await _firestore.collection('products').doc(productId).update({
+      'averageRating': double.parse(averageRating.toStringAsFixed(1)), // Store with 1 decimal place
+      'reviewCount': reviewCount,
+    });
+  }
 }
 
