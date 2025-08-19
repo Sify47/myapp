@@ -104,11 +104,11 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 40),
                   Image.network(
                     
-                    height: 120, 'https://d26czciiy2b0rz.cloudfront.net/uploads/images/header/waffarha_logo.png',
+                    height: 190, 'https://i.ibb.co/3mKCxgGf/Picsart-25-08-12-10-36-14-613.png' , scale: 2,
                     errorBuilder: (context, error, stackTrace) => 
                       const Icon(Icons.broken_image, size: 120),
                   ),
-                  const SizedBox(height: 32),
+                  // const SizedBox(height: 32),
                   Text(
                     _isLogin ? 'Welcome Back' : 'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(

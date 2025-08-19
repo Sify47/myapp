@@ -21,8 +21,11 @@ class _MainPageState extends State<MainPage> {
   // Updated list of pages for the new navigation bar
   final List<Widget> _pages = [
     const HomePage(), // 0: Home
-    const CatalogPage(cat: 'الكل',), // 1: Shop (Catalog)
-    const OffersPage(), // 2: Offers
+    const CatalogPage(
+      cat: 'All',
+      initialCollection: "All",
+    ), // 1: Shop (Catalog)
+    // const OffersPage(), // 2: Offers
     const CartPage(), // 3: Cart
     const AccountPage(), // 4: Account
   ];
@@ -73,11 +76,11 @@ class _MainPageState extends State<MainPage> {
               activeIcon: Icon(Icons.store),
               label: 'Shop',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer_outlined),
-              activeIcon: Icon(Icons.local_offer),
-              label: 'Offer',
-            ),
+            // const BottomNavigationBarItem(
+            //   icon: Icon(Icons.local_offer_outlined),
+            //   activeIcon: Icon(Icons.local_offer),
+            //   label: 'Offer',
+            // ),
             // Use StreamBuilder to listen for cart changes and update the badge
             BottomNavigationBarItem(
               icon: StreamBuilder<List<CartItem>>(

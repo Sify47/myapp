@@ -37,7 +37,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   // Shipping province state
   late String _selectedProvince = 'Cairo';
-  double _shippingCost = 50.0;
+  double _shippingCost = 55.0;
   List<Map<String, dynamic>> _provinces = [];
   bool _isLoadingProvinces = false;
 
@@ -55,12 +55,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
       _provinces = snapshot.docs.map((doc) => doc.data()).toList();
       if (_provinces.isNotEmpty) {
         _selectedProvince = _provinces.first['name'];
-        _shippingCost = _provinces.first['cost'] as double;
+        _shippingCost = _provinces.first['cost'];
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('حدث خطأ في تحميل بيانات الشحن: $e')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+        // SnackBar(content: Text('حدث خطأ في تحميل بيانات الشحن: $e')),
+      // );
     } finally {
       setState(() => _isLoadingProvinces = false);
     }

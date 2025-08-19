@@ -1,13 +1,14 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/product.dart';
 import '../widgets/product_card.dart';
 
 class CatalogPage extends StatefulWidget {
-  final String cat;
-  const CatalogPage({super.key, required this.cat});
+  final String? cat;
+  final String? initialCollection;
+
+  const CatalogPage({super.key, this.cat, this.initialCollection});
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
@@ -17,21 +18,24 @@ class _CatalogPageState extends State<CatalogPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
-  Map<String, String> brandNameToId = {};
+  // Map<String, String> brandNameToId = {};
+  Map<String, String> collectionNameToId = {};
 
   List<Product> _products = [];
-  List<String> categories = ['الكل'];
-  List<String> brands = ['كل البراندات'];
+  List<String> categories = ['All'];
+  // List<String> brands = ['كل البراندات'];
+  List<String> collections = ['All'];
   final List<String> priceRanges = [
-    'كل الأسعار',
-    'أقل من 50',
-    '50 - 100',
-    '100 - 200',
-    'أكثر من 200',
+    'All Price',
+    'Under 200',
+    '200 - 500',
+    '500 - 1000',
+    'Up To 1000',
   ];
 
-  String selectedCategory = 'الكل';
-  String? selectedBrand;
+  String selectedCategory = 'All';
+  // String? selectedBrand;
+  String? selectedCollection;
   String? selectedPriceRange;
   String _searchTerm = '';
   bool _isLoading = false;
@@ -39,21 +43,35 @@ class _CatalogPageState extends State<CatalogPage> {
   @override
   void initState() {
     super.initState();
-    selectedCategory = widget.cat;
+    selectedCategory = widget.cat ?? 'All';
+    selectedCollection = widget.initialCollection;
     Timer? searchTimer;
 
-_searchController.addListener(() {
-  setState(() => _searchTerm = _searchController.text.trim());
-  
-  // إلغاء المؤقت السابق إذا كان موجوداً
-  searchTimer?.cancel();
-  
-  // إنشاء مؤقت جديد (500 مللي ثانية بعد آخر كتابة)
-  searchTimer = Timer(const Duration(milliseconds: 500), () {
-    _loadProducts();
-  });
-});
-    _loadFilters();
+    _searchController.addListener(() {
+      setState(() => _searchTerm = _searchController.text.trim());
+      searchTimer?.cancel();
+      searchTimer = Timer(const Duration(milliseconds: 500), () {
+        _loadProducts();
+      });
+    });
+
+    _loadFilters()
+        .then((_) {
+          return _loadCollections();
+        })
+        .then((_) {
+          // بعد تحميل الفلاتر والمجموعات، نتحقق من القيمة الأولية
+          if (widget.initialCollection != null) {
+            final collectionId = collectionNameToId[widget.initialCollection!];
+            if (collectionId == null) {
+              debugPrint(
+                'Collection ID not found for: ${widget.initialCollection}',
+              );
+            }
+          }
+          return _loadProducts();
+        });
+    _loadCollections();
     _loadProducts();
   }
 
@@ -61,33 +79,54 @@ _searchController.addListener(() {
     try {
       final categorySnapshot =
           await FirebaseFirestore.instance.collection('categories').get();
-      final brandSnapshot =
-          await FirebaseFirestore.instance
-              .collection('brands')
-              // .where('productStatus', isEqualTo: 'active')
-              .get();
+      // final brandSnapshot = await FirebaseFirestore.instance.collection('brands').get();
 
       final fetchedCategories =
           categorySnapshot.docs
               .map((doc) => doc['name'] as String)
               .toSet()
               .toList();
+      // final fetchedBrands = <String, String>{};
+      // for (final doc in brandSnapshot.docs) {
+      //   final name = doc['name'] as String?;
+      //   if (name != null) {
+      //     fetchedBrands[name] = doc.id;
+      //   }
+      // }
 
-      final fetchedBrands = <String, String>{};
-      for (final doc in brandSnapshot.docs) {
-        final name = doc['name'] as String?;
+      setState(() {
+        // brands = ['كل البراندات', ...fetchedBrands.keys];
+        // brandNameToId = fetchedBrands;
+        categories = ['All', ...fetchedCategories];
+      });
+    } catch (e) {
+      debugPrint('Error loading filters: $e');
+    }
+  }
+
+  Future<void> _loadCollections() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('collections')
+              // .where('isActive', isEqualTo: true)
+              .orderBy("index" , descending: false)
+              .get();
+
+      final fetchedCollections = <String, String>{};
+      for (final doc in snapshot.docs) {
+        final name = doc['title'] as String?;
         if (name != null) {
-          fetchedBrands[name] = doc.id;
+          fetchedCollections[name] = doc.id;
         }
       }
 
       setState(() {
-        brands = ['كل البراندات', ...fetchedBrands.keys];
-        brandNameToId = fetchedBrands;
-        categories = ['الكل', ...fetchedCategories];
+        collections = ['All', ...fetchedCollections.keys];
+        collectionNameToId = fetchedCollections;
       });
     } catch (e) {
-      debugPrint('Error loading filters: $e');
+      debugPrint('Error loading collections: $e');
     }
   }
 
@@ -99,14 +138,23 @@ _searchController.addListener(() {
           .collection('products')
           .where('productStatus', isEqualTo: 'active');
 
-      if (selectedCategory != 'الكل') {
+      if (selectedCategory != 'All') {
         query = query.where('categories', arrayContains: selectedCategory);
       }
 
-      if (selectedBrand != null) {
-        final brandId = brandNameToId[selectedBrand!];
-        if (brandId != null) {
-          query = query.where('brandId', isEqualTo: brandId);
+      // if (selectedBrand != null) {
+      //   final brandId = brandNameToId[selectedBrand!];
+      //   if (brandId != null) {
+      //     query = query.where('brandId', isEqualTo: brandId);
+      //   }
+      // }
+
+      if (selectedCollection != null && selectedCollection != 'All') {
+        final collectionId = collectionNameToId[selectedCollection!];
+        if (collectionId != null) {
+          query = query.where('collectionId', isEqualTo: collectionId);
+        } else {
+          debugPrint('Collection ID not found for: $selectedCollection');
         }
       }
 
@@ -118,14 +166,14 @@ _searchController.addListener(() {
         result =
             result.where((product) {
               switch (selectedPriceRange) {
-                case 'أقل من 50':
-                  return product.price < 50;
-                case '50 - 100':
-                  return product.price >= 50 && product.price <= 100;
-                case '100 - 200':
-                  return product.price >= 100 && product.price <= 200;
-                case 'أكثر من 200':
-                  return product.price > 200;
+                case 'Under 200':
+                  return product.price < 200;
+                case '200 - 500':
+                  return product.price >= 200 && product.price <= 500;
+                case '500 - 1000':
+                  return product.price > 500 && product.price <= 1000;
+                case 'Up To 1000':
+                  return product.price > 1000;
                 default:
                   return true;
               }
@@ -150,16 +198,6 @@ _searchController.addListener(() {
     } finally {
       setState(() => _isLoading = false);
     }
-  }
-
-  InputDecoration dropdownDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      filled: true,
-      fillColor: Colors.white,
-    );
   }
 
   Widget _filterChip({required String label, required IconData icon}) {
@@ -187,7 +225,7 @@ _searchController.addListener(() {
       ),
       body: Column(
         children: [
-          // ✅ شريط الفلاتر الأفقي
+          // شريط الفلاتر الأفقي
           Container(
             height: 56,
             margin: const EdgeInsets.symmetric(vertical: 8),
@@ -197,13 +235,13 @@ _searchController.addListener(() {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  // 🔍 بحث
+                  // بحث
                   SizedBox(
                     width: 180,
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'بحث...',
+                        hintText: 'Search...',
                         prefixIcon: const Icon(Icons.search, size: 20),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 0,
@@ -220,9 +258,9 @@ _searchController.addListener(() {
                   ),
                   const SizedBox(width: 8),
 
-                  // 📦 الفئة (Category)
+                  // الفئة (Category)
                   PopupMenuButton<String>(
-                    tooltip: 'الفئة',
+                    tooltip: 'Categories',
                     onSelected: (value) {
                       setState(() => selectedCategory = value);
                       _loadProducts();
@@ -244,42 +282,64 @@ _searchController.addListener(() {
                   ),
                   const SizedBox(width: 8),
 
-                  // 🏭 البراند
+                  // البراند
+                  // PopupMenuButton<String>(
+                  //   tooltip: 'Brands',
+                  //   onSelected: (value) {
+                  //     setState(() => selectedBrand = value == 'كل البراندات' ? null : value);
+                  //     _loadProducts();
+                  //   },
+                  //   itemBuilder: (_) => brands.map((brand) => PopupMenuItem(
+                  //     value: brand,
+                  //     child: Text(brand),
+                  //   )).toList(),
+                  //   child: _filterChip(
+                  //     label: selectedBrand ?? 'كل البراندات',
+                  //     icon: Icons.store,
+                  //   ),
+                  // ),
+                  // const SizedBox(width: 8),
+
+                  // المجموعة (Collection)
                   PopupMenuButton<String>(
-                    tooltip: 'البراند',
+                    tooltip: 'Collections',
                     onSelected: (value) {
                       setState(
                         () =>
-                            selectedBrand =
-                                value == 'كل البراندات' ? null : value,
+                            selectedCollection = value == 'All' ? null : value,
                       );
                       _loadProducts();
                     },
                     itemBuilder:
                         (_) =>
-                            brands
+                            collections
                                 .map(
-                                  (brand) => PopupMenuItem(
-                                    value: brand,
-                                    child: Text(brand),
+                                  (col) => PopupMenuItem(
+                                    value: col,
+                                    child: Text(col),
                                   ),
                                 )
                                 .toList(),
                     child: _filterChip(
-                      label: selectedBrand ?? 'كل البراندات',
-                      icon: Icons.store,
+                      label: selectedCollection ?? 'Collections',
+                      icon:
+                          selectedCollection == 'Men'
+                              ? Icons.male
+                              : selectedCollection == 'Women'
+                              ? Icons.female
+                              : Icons.collections,
                     ),
                   ),
                   const SizedBox(width: 8),
 
-                  // 💰 السعر
+                  // السعر
                   PopupMenuButton<String>(
-                    tooltip: 'السعر',
+                    tooltip: 'Price',
                     onSelected: (value) {
                       setState(
                         () =>
                             selectedPriceRange =
-                                value == 'كل الأسعار' ? null : value,
+                                value == 'All Price' ? null : value,
                       );
                       _loadProducts();
                     },
@@ -294,20 +354,21 @@ _searchController.addListener(() {
                                 )
                                 .toList(),
                     child: _filterChip(
-                      label: selectedPriceRange ?? 'كل الأسعار',
+                      label: selectedPriceRange ?? 'All Price',
                       icon: Icons.attach_money,
                     ),
                   ),
                   const SizedBox(width: 8),
 
-                  // 🔄 إعادة تعيين
+                  // إعادة تعيين
                   IconButton(
-                    tooltip: 'إعادة تعيين',
+                    tooltip: 'Reset',
                     icon: const Icon(Icons.refresh, color: Colors.redAccent),
                     onPressed: () {
                       setState(() {
-                        selectedCategory = 'الكل';
-                        selectedBrand = null;
+                        selectedCategory = 'All';
+                        // selectedBrand = null;
+                        selectedCollection = null;
                         selectedPriceRange = null;
                         _searchController.clear();
                       });
@@ -319,13 +380,13 @@ _searchController.addListener(() {
             ),
           ),
 
-          // 🔲 المنتجات
+          // المنتجات
           Expanded(
             child:
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _products.isEmpty
-                    ? const Center(child: Text('لا توجد منتجات'))
+                    ? const Center(child: Text('No Products Found'))
                     : GridView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),

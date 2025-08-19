@@ -24,13 +24,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF3366FF),
+      backgroundColor: Color(0xFFB2B3B8),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.network(
-              'https://d26czciiy2b0rz.cloudfront.net/uploads/images/header/waffarha_logo.png',
+              'https://i.ibb.co/3mKCxgGf/Picsart-25-08-12-10-36-14-613.png',
               width: 100,
               height: 100,
             ),

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Product {
   final String id;
   final String name;
+  // final String gender;
   final String description;
   final List<String> images;
   final double price;
@@ -29,6 +30,7 @@ class Product {
   Product({
     required this.id,
     required this.name,
+    // required this.gender,
     required this.description,
     required this.images,
     required this.price,
@@ -60,6 +62,7 @@ class Product {
       return Product(
         id: doc.id,
         name: (data['name'] as String?) ?? 'بدون اسم',
+        // gender: (data['gender'] as String?) ?? 'بدون اسم',
         description: (data['description'] as String?) ?? '',
         images: _parseList<String>(data['images']),
         price: (data['price'] ?? 0.0).toDouble(),
@@ -108,6 +111,7 @@ class Product {
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
+      // 'gender': gender,
       'description': description,
       'images': images,
       'price': price,

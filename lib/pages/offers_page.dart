@@ -12,7 +12,7 @@ class OffersPage extends StatefulWidget {
 }
 
 class _OffersPageState extends State<OffersPage> {
-  String selectedCategory = 'الكل';
+  String selectedCategory = 'All';
   String searchQuery = '';
   List<DocumentSnapshot> allOffers = [];
   bool isLoading = true;
@@ -37,7 +37,7 @@ class _OffersPageState extends State<OffersPage> {
     return allOffers.where((doc) {
       final offer = doc.data()! as Map<String, dynamic>;
       final matchesCategory =
-          selectedCategory == 'الكل' || offer['category'] == selectedCategory;
+          selectedCategory == 'All' || offer['category'] == selectedCategory;
       final matchesSearch =
           offer['brand'].toString().toLowerCase().contains(
             searchQuery.toLowerCase(),
@@ -84,7 +84,7 @@ class _OffersPageState extends State<OffersPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       children: [
                         ...[
-                          'الكل',
+                          'All',
                           'رياضي',
                           'كلاسيكي',
                           'فاخر',
