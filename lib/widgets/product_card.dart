@@ -13,8 +13,14 @@ import '../services/cart_service.dart';
 class ProductCard extends StatelessWidget {
   final Product product;
   final double cardHeight;
+  final Function(bool)? onFavoriteChanged;
 
-  const ProductCard({super.key, required this.product, this.cardHeight = 220});
+  const ProductCard({
+    super.key,
+    required this.product,
+    this.cardHeight = 280,
+    this.onFavoriteChanged,
+  });
   
   @override
   Widget build(BuildContext context) {
@@ -45,45 +51,82 @@ class ProductCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12),
+                      top: Radius.circular(18),
                     ),
-                    child:
-                        product.images.isNotEmpty
-                            ? Image.network(
-                              product.images[0],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) return child;
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              },
-                              errorBuilder:
-                                  (context, error, stackTrace) => const Center(
-                                    child: Icon(
-                                      Icons.broken_image,
-                                      color: Colors.grey,
-                                      size: 40,
-                                    ),
-                                  ),
-                            )
-                            : const Center(
-                              child: Icon(
-                                Icons.image,
-                                color: Colors.grey,
-                                size: 40,
-                              ),
-                            ),
+                    child: product.images.isNotEmpty
+                        ? Image.network(
+                            product.images[0],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey.shade100,
+                                child: const Icon(Icons.image_not_supported_outlined, 
+                                  size: 40, color: Colors.grey),
+                              );
+                            },
+                          )
+                        : Container(
+                            color: Colors.grey.shade100,
+                            child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                          ),
                   ),
+                  
+                  // خصم إذا كان موجود
+                  if (product.discountPrice != null)
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade600,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'خصم ${((product.price - product.discountPrice!) / product.price * 100).toStringAsFixed(0)}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // زر المفضلة
                   Positioned(
-                  top: 8,
-                  right: 8,
-                  child: FavoriteButton(productId: product.id),
-                ),
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: FavoriteButton(
+  productId: product.id,
+  // onChanged: (isFavorite) {
+  //   if (onFavoriteChanged != null) {
+  //     onFavoriteChanged!(isFavorite);
+  //   }
+  // },
+),
+
+                    ),
+                  ),
                 ],
               ),
             ),
+
             // التفاصيل والسعر
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

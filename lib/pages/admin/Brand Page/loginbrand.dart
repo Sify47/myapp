@@ -39,7 +39,7 @@ class _BrandLoginPageState extends State<BrandLoginPage> {
 
     try {
       final auth = Provider.of<AuthModel>(context, listen: false);
-      await auth.loginwithbran(
+      await auth.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );

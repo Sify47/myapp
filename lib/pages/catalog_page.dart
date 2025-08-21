@@ -7,8 +7,9 @@ import '../widgets/product_card.dart';
 class CatalogPage extends StatefulWidget {
   final String? cat;
   final String? initialCollection;
+  final String? initialstyle;
 
-  const CatalogPage({super.key, this.cat, this.initialCollection});
+  const CatalogPage({super.key, this.cat, this.initialCollection , this.initialstyle});
 
   @override
   State<CatalogPage> createState() => _CatalogPageState();
@@ -23,7 +24,7 @@ class _CatalogPageState extends State<CatalogPage> {
 
   List<Product> _products = [];
   List<String> categories = ['All'];
-  // List<String> brands = ['كل البراندات'];
+  List<String> brands = ['All'];
   List<String> collections = ['All'];
   final List<String> priceRanges = [
     'All Price',
@@ -34,8 +35,9 @@ class _CatalogPageState extends State<CatalogPage> {
   ];
 
   String selectedCategory = 'All';
-  // String? selectedBrand;
+  String? selectedBrand;
   String? selectedCollection;
+  // String? selectedstyle;
   String? selectedPriceRange;
   String _searchTerm = '';
   bool _isLoading = false;
@@ -45,6 +47,7 @@ class _CatalogPageState extends State<CatalogPage> {
     super.initState();
     selectedCategory = widget.cat ?? 'All';
     selectedCollection = widget.initialCollection;
+    selectedBrand = widget.initialstyle;
     Timer? searchTimer;
 
     _searchController.addListener(() {
@@ -79,23 +82,23 @@ class _CatalogPageState extends State<CatalogPage> {
     try {
       final categorySnapshot =
           await FirebaseFirestore.instance.collection('categories').get();
-      // final brandSnapshot = await FirebaseFirestore.instance.collection('brands').get();
+      final brandSnapshot = await FirebaseFirestore.instance.collection('styles').get();
 
       final fetchedCategories =
           categorySnapshot.docs
               .map((doc) => doc['name'] as String)
               .toSet()
               .toList();
-      // final fetchedBrands = <String, String>{};
-      // for (final doc in brandSnapshot.docs) {
-      //   final name = doc['name'] as String?;
-      //   if (name != null) {
-      //     fetchedBrands[name] = doc.id;
-      //   }
-      // }
+      final fetchedBrands = <String, String>{};
+      for (final doc in brandSnapshot.docs) {
+        final name = doc['name'] as String?;
+        if (name != null) {
+          fetchedBrands[name] = doc.id;
+        }
+      }
 
       setState(() {
-        // brands = ['كل البراندات', ...fetchedBrands.keys];
+        brands = ['All', ...fetchedBrands.keys];
         // brandNameToId = fetchedBrands;
         categories = ['All', ...fetchedCategories];
       });
@@ -110,7 +113,7 @@ class _CatalogPageState extends State<CatalogPage> {
           await FirebaseFirestore.instance
               .collection('collections')
               // .where('isActive', isEqualTo: true)
-              .orderBy("index" , descending: false)
+              // .orderBy("index" , descending: false)
               .get();
 
       final fetchedCollections = <String, String>{};
@@ -142,12 +145,12 @@ class _CatalogPageState extends State<CatalogPage> {
         query = query.where('categories', arrayContains: selectedCategory);
       }
 
-      // if (selectedBrand != null) {
-      //   final brandId = brandNameToId[selectedBrand!];
-      //   if (brandId != null) {
-      //     query = query.where('brandId', isEqualTo: brandId);
-      //   }
-      // }
+      if (selectedBrand != null) {
+        // final brandId = brandNameToId[selectedBrand!];
+        // if (brandId != null) {
+          query = query.where('style', isEqualTo: selectedBrand);
+        }
+      
 
       if (selectedCollection != null && selectedCollection != 'All') {
         final collectionId = collectionNameToId[selectedCollection!];
@@ -283,22 +286,22 @@ class _CatalogPageState extends State<CatalogPage> {
                   const SizedBox(width: 8),
 
                   // البراند
-                  // PopupMenuButton<String>(
-                  //   tooltip: 'Brands',
-                  //   onSelected: (value) {
-                  //     setState(() => selectedBrand = value == 'كل البراندات' ? null : value);
-                  //     _loadProducts();
-                  //   },
-                  //   itemBuilder: (_) => brands.map((brand) => PopupMenuItem(
-                  //     value: brand,
-                  //     child: Text(brand),
-                  //   )).toList(),
-                  //   child: _filterChip(
-                  //     label: selectedBrand ?? 'كل البراندات',
-                  //     icon: Icons.store,
-                  //   ),
-                  // ),
-                  // const SizedBox(width: 8),
+                  PopupMenuButton<String>(
+                    tooltip: 'Style',
+                    onSelected: (value) {
+                      setState(() => selectedBrand = value == 'All' ? null : value);
+                      _loadProducts();
+                    },
+                    itemBuilder: (_) => brands.map((brand) => PopupMenuItem(
+                      value: brand,
+                      child: Text(brand),
+                    )).toList(),
+                    child: _filterChip(
+                      label: selectedBrand ?? 'Styles',
+                      icon: Icons.store,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
 
                   // المجموعة (Collection)
                   PopupMenuButton<String>(

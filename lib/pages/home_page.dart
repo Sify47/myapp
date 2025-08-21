@@ -227,7 +227,14 @@ class HomePage extends StatelessWidget {
               // final title = data['title'] ?? 'عرض خاص'; // النص الذي تريد عرضه
 
               return GestureDetector(
-                onTap: () => _handleBannerTap(context, data),
+                 onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CatalogPage(initialstyle: data['name'],),
+          ),
+        );
+      },
                 child: Container(
                   width: 250,
                   height: 90,
@@ -256,7 +263,7 @@ class HomePage extends StatelessWidget {
                           ),
                           child: CachedNetworkImage(
                             imageUrl: data['image_url'],
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fitWidth,
                             width: double.infinity,
                             height: double.infinity,
                             placeholder:

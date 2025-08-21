@@ -43,9 +43,12 @@ class MyApp extends StatelessWidget {
   final NotificationService notificationService;
 
   const MyApp({super.key, required this.notificationService});
+  
+  
 
   @override
   Widget build(BuildContext context) {
+    
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
